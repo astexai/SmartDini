@@ -1,6 +1,4 @@
-// utils/motion.ts
 
-// Define types for animation parameters
 type Direction = 'left' | 'right' | 'up' | 'down';
 type TransitionType = 'spring' | 'tween' | 'inertia' | 'just';
 
