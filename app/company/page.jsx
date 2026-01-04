@@ -1,10 +1,10 @@
 "use client";
 
 import { useEffect } from "react";
-import Header from "@/components/ui/Header";
-import Footer from "@/components/ui/Footer";
-import ScrollToTop from "@/components/ui/ScrollToTop";
-import ScrollAnimations from "@/components/ui/ScrollAnimations";
+import Header from "@/components/Header";
+import Footer from "@/components/Footer";
+import ScrollToTop from "@/components/ScrollToTop";
+import ScrollAnimations from "@/components/ScrollAnimations";
 import { Button } from "@/components/ui/button";
 import { Target, Zap, Coffee, Heart } from "lucide-react";
 import { motion } from "framer-motion";
