@@ -195,3 +195,71 @@
 }
 
 /* Import Google Fonts */
+
+
+
+
+
+@layer base {
+  :root {
+    --background: 0 0% 96%;
+    --foreground: 0 0% 13%;
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 13%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 13%;
+    --primary: 355 72% 46%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 151 100% 37%;
+    --secondary-foreground: 0 0% 100%;
+    --muted: 0 0% 96%;
+    --muted-foreground: 0 0% 45%;
+    --accent: 151 100% 37%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 0 0% 90%;
+    --input: 0 0% 100%;
+    --ring: 355 72% 46%;
+    --radius: 0.75rem;
+  }
+
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-family: 'Inter', sans-serif;
+  }
+}
+
+@layer components {
+  .metric-card {
+    @apply bg-card rounded-xl border p-4;
+  }
+  
+  .status-badge {
+    @apply px-2 py-1 rounded-md text-xs font-medium;
+  }
+  
+  .status-badge-new {
+    @apply bg-blue-100 text-blue-700;
+  }
+  
+  .status-badge-accepted {
+    @apply bg-emerald-100 text-emerald-700;
+  }
+  
+  .status-badge-rejected {
+    @apply bg-rose-100 text-rose-700;
+  }
+  
+  .status-badge-pending {
+    @apply bg-amber-100 text-amber-700;
+  }
+  
+  .status-badge-completed {
+    @apply bg-emerald-100 text-emerald-700;
+  }
+}

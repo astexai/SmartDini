@@ -1,10 +1,10 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { User, Lock, Eye, EyeOff } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Eye, EyeOff } from "lucide-react";
 
 export default function CafeAdminLogin({ params }: { params: { menupages: string } }) {
   const router = useRouter();
@@ -18,7 +18,7 @@ export default function CafeAdminLogin({ params }: { params: { menupages: string
   };
 
   return (
-    <div className="min-h-[100dvh] bg-background grid place-items-center px-4 py-6">
+    <div className="min-h-screen bg-background flex items-center justify-center px-4">
       <form
         onSubmit={onLogin}
         className="w-full max-w-md md:max-w-lg mx-auto bg-card rounded-2xl md:rounded-3xl border p-6 md:p-8 space-y-6 shadow"
@@ -26,32 +26,33 @@ export default function CafeAdminLogin({ params }: { params: { menupages: string
         <div className="text-3xl font-bold text-center">
           <span className="text-primary">Smart</span>dini
         </div>
-        <div className="text-center text-sm text-muted-foreground">Partner Login</div>
+        <div className="text-center text-sm text-muted-foreground">Cafe Admin Portal</div>
 
         <div className="space-y-4">
-          <div className="relative">
-            <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <div>
+            <label className="text-sm mb-1 block">Username</label>
             <Input
               required
               type="text"
               value={user}
               onChange={(e) => setUser(e.target.value)}
-              placeholder="Username / Store ID"
+              placeholder="Enter username / store id"
               autoComplete="username"
-              className="pl-9 h-11"
+              className="h-11"
             />
           </div>
-          <div className="relative">
-            <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input
-              required
-              type={show ? "text" : "password"}
-              value={pass}
-              onChange={(e) => setPass(e.target.value)}
-              placeholder="Password"
-              autoComplete="current-password"
-              className="pl-9 pr-9 h-11"
-            />
+          <div>
+            <label className="text-sm mb-1 block">Password</label>
+            <div className="relative">
+              <Input
+                required
+                type={show ? "text" : "password"}
+                value={pass}
+                onChange={(e) => setPass(e.target.value)}
+                placeholder="Enter password"
+                autoComplete="current-password"
+                className="pr-9 h-11"
+              />
             <button
               type="button"
               onClick={() => setShow((v) => !v)}
@@ -60,6 +61,7 @@ export default function CafeAdminLogin({ params }: { params: { menupages: string
             >
               {show ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
             </button>
+            </div>
           </div>
 
           <Button type="submit" className="w-full h-12 text-base">

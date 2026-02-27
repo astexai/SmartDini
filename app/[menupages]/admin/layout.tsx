@@ -16,7 +16,7 @@ export default function AdminLayout({
   const base = `/${params.menupages}/admin`;
   const pathname = usePathname();
 
-  const Item = ({
+  const NavItem = ({
     href,
     children,
     icon: Icon,
@@ -27,14 +27,15 @@ export default function AdminLayout({
     icon: React.ComponentType<any>;
     onNavigate?: () => void;
   }) => {
-    const active = pathname?.startsWith(href);
+    const active = pathname === href || (href !== base && pathname?.startsWith(href));
     return (
       <Link
         href={href}
         onClick={onNavigate}
-        aria-current={active ? "page" : undefined}
-        className={`flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium border transition-colors ${
-          active ? "bg-primary/10 text-primary border-primary/30" : "bg-white border-transparent"
+        className={`flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium transition-all ${
+          active 
+            ? "bg-primary/10 text-primary border-l-4 border-primary" 
+            : "text-muted-foreground hover:bg-muted/50 hover:text-foreground"
         }`}
       >
         <Icon className="h-4 w-4" />
@@ -43,67 +44,88 @@ export default function AdminLayout({
     );
   };
 
-  const Nav = ({ onNavigate }: { onNavigate?: () => void }) => (
-    <nav className="flex flex-col gap-2">
-      <Item href={`${base}`} icon={LayoutDashboard} onNavigate={onNavigate}>
+  const Navigation = ({ onNavigate }: { onNavigate?: () => void }) => (
+    <nav className="flex flex-col gap-1">
+      <NavItem href={base} icon={LayoutDashboard} onNavigate={onNavigate}>
         Dashboard
-      </Item>
-      <Item href={`${base}/new-orders`} icon={ClipboardList} onNavigate={onNavigate}>
+      </NavItem>
+      <NavItem href={`${base}/new-orders`} icon={ClipboardList} onNavigate={onNavigate}>
         New Orders
-      </Item>
-      <Item href={`${base}/orders`} icon={ListChecks} onNavigate={onNavigate}>
+      </NavItem>
+      <NavItem href={`${base}/orders`} icon={ListChecks} onNavigate={onNavigate}>
         Orders
-      </Item>
-      <Item href={`${base}/manage-menu`} icon={UtensilsCrossed} onNavigate={onNavigate}>
+      </NavItem>
+      <NavItem href={`${base}/manage-menu`} icon={UtensilsCrossed} onNavigate={onNavigate}>
         Manage Menu
-      </Item>
+      </NavItem>
     </nav>
   );
 
   return (
-    <div className="min-h-svh bg-background">
-      <div className="w-full bg-primary text-primary-foreground">
-        <div className="max-w-6xl mx-auto px-4 py-3 flex items-center justify-between">
-          <div className="text-lg font-semibold">Admin Dashboard !</div>
+    <div className="min-h-screen bg-background">
+      {/* Header */}
+      <header className="bg-primary text-primary-foreground sticky top-0 z-30">
+        <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
+          <h1 className="text-lg font-semibold">Admin Dashboard !</h1>
           <button
-            className="lg:hidden rounded-md bg-white/10 px-3 py-2"
-            onClick={() => setOpen((v) => !v)}
-            aria-label="Toggle menu"
+            onClick={() => setOpen(true)}
+            className="lg:hidden p-2 hover:bg-white/10 rounded-lg transition-colors"
+            aria-label="Open menu"
           >
-            {open ? <X /> : <Menu />}
+            <Menu className="h-5 w-5" />
           </button>
+        </div>
+      </header>
+
+      {/* Main Content */}
+      <div className="max-w-7xl mx-auto px-4 py-6">
+        <div className="flex gap-6">
+          {/* Desktop Sidebar */}
+          <aside className="hidden lg:block w-64 flex-shrink-0">
+            <div className="bg-card rounded-xl border sticky top-20">
+              <div className="p-4 border-b">
+                <h2 className="font-bold text-xl text-primary">SMARTDINI</h2>
+              </div>
+              <div className="p-3">
+                <Navigation />
+              </div>
+            </div>
+          </aside>
+
+          {/* Main Content Area */}
+          <main className="flex-1 min-w-0">
+            <div className="bg-card rounded-xl border">
+              <div className="p-4 border-b bg-muted/5">
+                <div className="inline-flex items-center gap-2 bg-white border rounded-full px-4 py-1.5 shadow-sm">
+                  <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
+                  <span className="text-sm font-medium">Admin Dashboard</span>
+                </div>
+              </div>
+              <div className="p-6">
+                {children}
+              </div>
+            </div>
+          </main>
         </div>
       </div>
 
-      <div className="max-w-6xl mx-auto w-full px-4 py-4 grid grid-cols-1 lg:grid-cols-[260px_minmax(0,1fr)] gap-4">
-        <aside className="hidden lg:block lg:sticky lg:top-0 self-start">
-          <div className="bg-card rounded-2xl border p-4 relative shadow-sm">
-            <div className="absolute right-0 top-0 bottom-0 w-2 bg-primary/80 rounded-r-xl"></div>
-            <div className="mb-3 font-extrabold text-primary tracking-wide">SMARTDINI</div>
-            <Nav />
-          </div>
-        </aside>
-
-        <main className="min-w-0">
-          <div className="bg-card rounded-2xl border p-4">
-            <div className="inline-flex items-center gap-2 bg-white border rounded-full px-3 py-1 shadow-sm mb-3">
-              <div className="size-5 rounded-full bg-muted grid place-items-center">•</div>
-              <div className="text-sm font-medium">Admin Dashboard !</div>
-            </div>
-            {children}
-          </div>
-        </main>
-      </div>
-
+      {/* Mobile Sidebar */}
       {open && (
         <div className="fixed inset-0 z-50 lg:hidden">
-          <div
-            className="absolute inset-0 bg-black/40"
-            onClick={() => setOpen(false)}
-          />
-          <div className="absolute left-0 top-0 bottom-0 w-72 bg-card border-r p-4">
-            <div className="mb-3 font-extrabold text-primary">SMARTDINI</div>
-            <Nav onNavigate={() => setOpen(false)} />
+          <div className="absolute inset-0 bg-black/60" onClick={() => setOpen(false)} />
+          <div className="absolute left-0 top-0 bottom-0 w-72 bg-card">
+            <div className="p-4 border-b flex items-center justify-between">
+              <h2 className="font-bold text-xl text-primary">SMARTDINI</h2>
+              <button
+                onClick={() => setOpen(false)}
+                className="p-2 hover:bg-muted rounded-lg"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+            <div className="p-3">
+              <Navigation onNavigate={() => setOpen(false)} />
+            </div>
           </div>
         </div>
       )}

@@ -1,194 +1,212 @@
- "use client";
+"use client";
 
 import { useState } from "react";
 import Link from "next/link";
-import { ShoppingCart, Plus, Minus } from "lucide-react";
-import { Button } from "@/components/ui/button";
- import Image from "next/image";
+import Image from "next/image";
+import { ShoppingCart, Plus, Minus, Pizza, Coffee, Beef, Soup, CupSoda, Cookie } from "lucide-react";
 
 type Params = {
   menupages: string;
 };
 
-type Item = {
+type MenuItem = {
   id: number;
-  title: string;
+  name: string;
   price: number;
-  prep: string;
+  category: string;
+  image?: string;
+  popular?: boolean;
 };
 
-const items: Item[] = Array.from({ length: 7 }, (_, i) => ({
-  id: i + 1,
-  title: `Pizza Categories ${i + 1}`,
-  price: 149,
-  prep: "Prepare in 10 min",
-}));
+const categories = [
+  { id: 1, name: "Pizza", icon: Pizza, color: "bg-orange-100 text-orange-600" },
+  { id: 2, name: "French Fries", icon: Cookie, color: "bg-yellow-100 text-yellow-600" },
+  { id: 3, name: "Burger", icon: Beef, color: "bg-amber-100 text-amber-600" },
+  { id: 4, name: "Maggie", icon: Soup, color: "bg-red-100 text-red-600" },
+  { id: 5, name: "Cold Coffee", icon: CupSoda, color: "bg-brown-100 text-brown-600" },
+  { id: 6, name: "Momos", icon: Coffee, color: "bg-purple-100 text-purple-600" },
+];
+
+const menuItems: MenuItem[] = [
+  { id: 1, name: "Pizza Categories 1", price: 149, category: "Pizza", popular: true },
+  { id: 2, name: "Pizza Categories 2", price: 149, category: "Pizza", popular: true },
+  { id: 3, name: "Pizza Categories 3", price: 149, category: "Pizza" },
+  { id: 4, name: "Pizza Categories 4", price: 149, category: "Pizza" },
+  { id: 5, name: "Pizza Categories 5", price: 149, category: "Pizza" },
+  { id: 6, name: "Pizza Categories 6", price: 149, category: "Pizza" },
+  { id: 7, name: "Pizza Categories 7", price: 149, category: "Pizza" },
+];
 
 export default function MenuPage({ params }: { params: Params }) {
-  const [qty, setQty] = useState<Record<number, number>>({});
+  const [quantities, setQuantities] = useState<Record<number, number>>({});
+  const [activeCategory, setActiveCategory] = useState("Pizza");
 
-  const totalItems = Object.values(qty).reduce((a, b) => a + b, 0);
-  const totalPrice = Object.entries(qty).reduce((sum, [id, q]) => {
-    const item = items.find((it) => it.id === Number(id));
-    return sum + (item ? item.price * q : 0);
-  }, 0);
-
-  const inc = (id: number) =>
-    setQty((s) => ({ ...s, [id]: (s[id] || 0) + 1 }));
-  const dec = (id: number) =>
-    setQty((s) => {
-      const v = (s[id] || 0) - 1;
-      const n = { ...s };
-      if (v <= 0) {
-        delete n[id];
-      } else {
-        n[id] = v;
+  const updateQuantity = (id: number, change: number) => {
+    setQuantities(prev => {
+      const current = prev[id] || 0;
+      const newQty = current + change;
+      
+      if (newQty <= 0) {
+        const { [id]: _, ...rest } = prev;
+        return rest;
       }
-      return n;
+      
+      return { ...prev, [id]: newQty };
     });
+  };
+
+  const getQuantity = (id: number) => quantities[id] || 0;
+
+  const cartItems = Object.entries(quantities)
+    .map(([id, qty]) => {
+      const item = menuItems.find(i => i.id === Number(id));
+      return item ? { ...item, qty } : null;
+    })
+    .filter(Boolean);
+
+  const totalItems = cartItems.reduce((sum, item) => sum + (item?.qty || 0), 0);
+  const totalPrice = cartItems.reduce((sum, item) => sum + (item?.price || 0) * (item?.qty || 0), 0);
 
   return (
-    <div className="min-h-svh bg-background">
-      <div className="mx-auto w-full max-w-[430px] min-h-svh bg-card shadow-2xl">
-        <div className="sticky top-0 z-50 bg-card bg-white border-b shadow-sm">
+    <div className="min-h-screen bg-gray-50">
+      {/* Mobile Container */}
+      <div className="max-w-md mx-auto bg-white min-h-screen shadow-lg relative">
+        {/* Header */}
+        <header className="sticky top-0 z-10 bg-white border-b">
           <div className="px-4 py-3 flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <div className="size-6 rounded-lg overflow-hidden bg-muted">
-                <Image src="/images/item-pizza.svg" alt="logo" width={24} height={24} />
+              <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
+                <span className="text-white font-bold text-sm">SD</span>
               </div>
-              <div className="text-xl font-semibold text-foreground">
-                <span className="text-primary">Smart</span>Dini
-              </div>
-            </div>
-            <div className="relative">
-              <div className="relative">
-                <Button
-                  aria-label="Open cart"
-                  variant="outline"
-                  size="icon"
-                  className="rounded-full bg-white border shadow-xs"
-                >
-                  <ShoppingCart className="h-5 w-5 text-foreground" />
-                </Button>
-                {totalItems > 0 && (
-                  <span className="absolute -top-1 -right-1 bg-primary text-primary-foreground text-[10px] leading-none px-1.5 py-0.5 rounded-full pointer-events-none">
-                    {totalItems}
-                  </span>
-                )}
+              <div>
+                <h1 className="text-xl font-bold">
+                  <span className="text-primary">Smart</span>Dini
+                </h1>
+                <p className="text-xs text-gray-500">Scan. Order. Enjoy.</p>
               </div>
             </div>
+            <Link href={`/${params.menupages}/menu/checkout`} className="relative">
+              <div className="p-2 bg-gray-100 rounded-full">
+                <ShoppingCart className="w-5 h-5 text-gray-700" />
+              </div>
+              {totalItems > 0 && (
+                <span className="absolute -top-1 -right-1 bg-primary text-white text-xs w-5 h-5 rounded-full flex items-center justify-center">
+                  {totalItems}
+                </span>
+              )}
+            </Link>
+          </div>
+        </header>
+
+        {/* Hero Banner */}
+        <div className="px-4 py-3">
+          <div className="bg-primary rounded-xl p-4 text-white">
+            <p className="text-sm opacity-90">Where Menus Go Digital.</p>
+            <p className="text-xs opacity-75 mt-1">Scan QR code to order</p>
           </div>
         </div>
 
-        <div className="px-4 py-3">
-          <div className="rounded-xl bg-primary text-primary-foreground p-4 shadow">
-            <div className="font-semibold">
-              Scan. Order. Enjoy.
-            </div>
-            <div className="text-sm opacity-90">
-              Where Menus Go Digital.
-            </div>
-          </div>
-
-          <div className="mt-3 overflow-auto">
-            <div className="flex items-center gap-4">
-              {[
-                { label: "Pizza", icon: "/images/pizza.svg" },
-                { label: "French Fries", icon: "/images/fries.svg" },
-                { label: "Burger", icon: "/images/burger.svg" },
-                { label: "Maggie", icon: "/images/maggie.svg" },
-                { label: "Cold Coffee", icon: "/images/cold-coffee.svg" },
-                { label: "Momos", icon: "/images/momos.svg" },
-              ].map((c, i) => (
-                <div key={i} className="flex flex-col items-center gap-1 min-w-16">
-                  <div className="size-12 rounded-full bg-white border flex items-center justify-center overflow-hidden">
-                    <Image src={c.icon} alt={c.label} width={24} height={24} />
+        {/* Categories Scroll */}
+        <div className="px-4">
+          <div className="flex gap-4 overflow-x-auto pb-2 scrollbar-hide">
+            {categories.map((cat) => {
+              const Icon = cat.icon;
+              return (
+                <button
+                  key={cat.id}
+                  onClick={() => setActiveCategory(cat.name)}
+                  className={`flex flex-col items-center gap-1 min-w-[70px] transition-all ${
+                    activeCategory === cat.name ? 'opacity-100' : 'opacity-60'
+                  }`}
+                >
+                  <div className={`w-14 h-14 rounded-2xl ${cat.color} flex items-center justify-center`}>
+                    <Icon className="w-6 h-6" />
                   </div>
-                  <span className="text-[11px] text-foreground/80 text-center">
-                    {c.label}
+                  <span className="text-xs font-medium text-gray-700 text-center">
+                    {cat.name}
                   </span>
-                </div>
-              ))}
-            </div>
+                </button>
+              );
+            })}
           </div>
+        </div>
 
-          <div className="mt-4">
-            <div className="text-base font-semibold text-foreground mb-2">
-              Pizza Categories
-            </div>
-            <div className="space-y-3">
-              {items.map((it) => (
+        {/* Menu Items */}
+        <div className="px-4 py-4">
+          <h2 className="text-lg font-bold mb-3">{activeCategory} Categories</h2>
+          <div className="space-y-3">
+            {menuItems.map((item) => {
+              const qty = getQuantity(item.id);
+              
+              return (
                 <div
-                  key={it.id}
-                  className="flex items-center justify-between rounded-lg border bg-card px-3 py-2"
+                  key={item.id}
+                  className="flex items-center justify-between bg-white border rounded-xl p-3"
                 >
                   <div className="flex items-center gap-3">
-                    <div className="size-12 rounded-lg bg-muted shrink-0 overflow-hidden">
-                      <Image
-                        src="/images/item-pizza.svg"
-                        alt={it.title}
-                        width={48}
-                        height={48}
-                        className="object-cover"
-                      />
+                    {/* Item Image Placeholder */}
+                    <div className="w-16 h-16 bg-gradient-to-br from-gray-100 to-gray-200 rounded-xl flex items-center justify-center">
+                      <Pizza className="w-8 h-8 text-gray-400" />
                     </div>
+                    
                     <div>
-                      <div className="text-sm font-medium text-foreground">
-                        {it.title}
-                      </div>
-                      <div className="text-[11px] text-muted-foreground">
-                        {it.prep}
-                      </div>
-                      <div className="text-xs text-foreground/70">₹{it.price}</div>
+                      <h3 className="font-semibold text-gray-900">{item.name}</h3>
+                      <p className="text-xs text-gray-500 mt-0.5">Classic taste</p>
+                      <p className="text-sm font-bold text-primary mt-1">₹{item.price}</p>
                     </div>
                   </div>
+
                   <div>
-                    {qty[it.id] ? (
-                      <div className="flex items-center gap-2 bg-muted rounded-full px-2 py-1">
-                        <Button
-                          size="icon-sm"
-                          variant="outline"
-                          onClick={() => dec(it.id)}
-                        >
-                          <Minus className="h-4 w-4" />
-                        </Button>
-                        <div className="w-6 text-center text-sm">
-                          {qty[it.id]}
-                        </div>
-                        <Button
-                          size="icon-sm"
-                          onClick={() => inc(it.id)}
-                        >
-                          <Plus className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    ) : (
-                      <Button onClick={() => inc(it.id)} className="px-6 bg-muted text-foreground hover:bg-muted/90 border rounded-full">
+                    {qty === 0 ? (
+                      <button
+                        onClick={() => updateQuantity(item.id, 1)}
+                        className="px-6 py-2 bg-primary text-white rounded-lg text-sm font-medium hover:bg-primary/90 transition-colors"
+                      >
                         ADD
-                      </Button>
+                      </button>
+                    ) : (
+                      <div className="flex items-center gap-2 bg-gray-100 rounded-lg p-1">
+                        <button
+                          onClick={() => updateQuantity(item.id, -1)}
+                          className="w-8 h-8 bg-white rounded-lg flex items-center justify-center shadow-sm"
+                        >
+                          <Minus className="w-4 h-4 text-gray-600" />
+                        </button>
+                        <span className="w-8 text-center font-semibold">{qty}</span>
+                        <button
+                          onClick={() => updateQuantity(item.id, 1)}
+                          className="w-8 h-8 bg-primary text-white rounded-lg flex items-center justify-center shadow-sm"
+                        >
+                          <Plus className="w-4 h-4" />
+                        </button>
+                      </div>
                     )}
                   </div>
                 </div>
-              ))}
-            </div>
+              );
+            })}
           </div>
         </div>
 
-        <div className="sticky bottom-0 z-50 bg-card bg-white border-t px-4 py-3 shadow-[0_-2px_10px_rgba(0,0,0,0.06)]">
-          <div className="flex items-center justify-between gap-3">
-            <div className="text-sm text-foreground/90">
-              {totalItems} items in cart
-              <div className="text-xs text-muted-foreground">Total ₹{totalPrice}</div>
+        {/* Cart Bottom Bar */}
+        {totalItems > 0 && (
+          <div className="sticky bottom-0 left-0 right-0 bg-white border-t shadow-lg">
+            <div className="max-w-md mx-auto p-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-gray-500">{totalItems} Items in cart</p>
+                  <p className="text-lg font-bold text-primary">₹{totalPrice}</p>
+                </div>
+                <Link
+                  href={`/${params.menupages}/menu/checkout`}
+                  className="bg-primary text-white px-6 py-3 rounded-xl font-semibold hover:bg-primary/90 transition-colors"
+                >
+                  Checkout →
+                </Link>
+              </div>
             </div>
-            <Link
-              href={`/${params.menupages}/menu/checkout`}
-              prefetch={false}
-              className="w-40"
-            >
-              <Button className="w-full">Checkout</Button>
-            </Link>
           </div>
-        </div>
+        )}
       </div>
     </div>
   );
