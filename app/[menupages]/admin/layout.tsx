@@ -1,134 +1,123 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname, useParams } from "next/navigation";
 import { useState } from "react";
-import { usePathname } from "next/navigation";
-import { Menu, X, LayoutDashboard, ClipboardList, ListChecks, UtensilsCrossed } from "lucide-react";
+import {
+  LayoutDashboard,
+  Bell,
+  ClipboardList,
+  UtensilsCrossed,
+  Menu,
+  X,
+  User,
+} from "lucide-react";
 
-export default function AdminLayout({
-  children,
-  params,
-}: {
-  children: React.ReactNode;
-  params: { menupages: string };
-}) {
-  const [open, setOpen] = useState(false);
-  const base = `/${params.menupages}/admin`;
+export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  const params = useParams();
+  const menupages = params?.menupages as string;
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
-  const NavItem = ({
-    href,
-    children,
-    icon: Icon,
-    onNavigate,
-  }: {
-    href: string;
-    children: React.ReactNode;
-    icon: React.ComponentType<any>;
-    onNavigate?: () => void;
-  }) => {
-    const active = pathname === href || (href !== base && pathname?.startsWith(href));
-    return (
-      <Link
-        href={href}
-        onClick={onNavigate}
-        className={`flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium transition-all ${
-          active 
-            ? "bg-primary/10 text-primary border-l-4 border-primary" 
-            : "text-muted-foreground hover:bg-muted/50 hover:text-foreground"
-        }`}
-      >
-        <Icon className="h-4 w-4" />
-        {children}
-      </Link>
-    );
-  };
+  const base = `/${menupages}/admin`;
 
-  const Navigation = ({ onNavigate }: { onNavigate?: () => void }) => (
-    <nav className="flex flex-col gap-1">
-      <NavItem href={base} icon={LayoutDashboard} onNavigate={onNavigate}>
-        Dashboard
-      </NavItem>
-      <NavItem href={`${base}/new-orders`} icon={ClipboardList} onNavigate={onNavigate}>
-        New Orders
-      </NavItem>
-      <NavItem href={`${base}/orders`} icon={ListChecks} onNavigate={onNavigate}>
-        Orders
-      </NavItem>
-      <NavItem href={`${base}/manage-menu`} icon={UtensilsCrossed} onNavigate={onNavigate}>
-        Manage Menu
-      </NavItem>
-    </nav>
-  );
+  const navItems = [
+    { label: "Dashboard",   href: base,                    icon: LayoutDashboard },
+    { label: "New Orders",  href: `${base}/new-orders`,    icon: Bell },
+    { label: "Orders",      href: `${base}/orders`,        icon: ClipboardList },
+    { label: "Manage Menu", href: `${base}/manage-menu`,   icon: UtensilsCrossed },
+  ];
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Header */}
-      <header className="bg-primary text-primary-foreground sticky top-0 z-30">
-        <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between">
-          <h1 className="text-lg font-semibold">Admin Dashboard !</h1>
-          <button
-            onClick={() => setOpen(true)}
-            className="lg:hidden p-2 hover:bg-white/10 rounded-lg transition-colors"
-            aria-label="Open menu"
-          >
-            <Menu className="h-5 w-5" />
-          </button>
-        </div>
-      </header>
+    <div
+      className="min-h-screen bg-[hsl(0,0%,92%)]"
+      style={{ fontFamily: "'Poppins', sans-serif" }}
+    >
+      {/* Mobile overlay */}
+      {sidebarOpen && (
+        <div
+          className="fixed inset-0 bg-black/50 z-20 lg:hidden"
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
 
-      {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-4 py-6">
-        <div className="flex gap-6">
-          {/* Desktop Sidebar */}
-          <aside className="hidden lg:block w-64 flex-shrink-0">
-            <div className="bg-card rounded-xl border sticky top-20">
-              <div className="p-4 border-b">
-                <h2 className="font-bold text-xl text-primary">SMARTDINI</h2>
-              </div>
-              <div className="p-3">
-                <Navigation />
-              </div>
-            </div>
-          </aside>
-
-          {/* Main Content Area */}
-          <main className="flex-1 min-w-0">
-            <div className="bg-card rounded-xl border">
-              <div className="p-4 border-b bg-muted/5">
-                <div className="inline-flex items-center gap-2 bg-white border rounded-full px-4 py-1.5 shadow-sm">
-                  <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
-                  <span className="text-sm font-medium">Admin Dashboard</span>
-                </div>
-              </div>
-              <div className="p-6">
-                {children}
-              </div>
-            </div>
-          </main>
-        </div>
-      </div>
-
-      {/* Mobile Sidebar */}
-      {open && (
-        <div className="fixed inset-0 z-50 lg:hidden">
-          <div className="absolute inset-0 bg-black/60" onClick={() => setOpen(false)} />
-          <div className="absolute left-0 top-0 bottom-0 w-72 bg-card">
-            <div className="p-4 border-b flex items-center justify-between">
-              <h2 className="font-bold text-xl text-primary">SMARTDINI</h2>
+      <div className="flex min-h-screen p-3 sm:p-4 gap-3 sm:gap-4">
+        {/* ─── Sidebar ─── */}
+        <aside
+          className={[
+            "fixed top-0 left-0 h-full z-30 w-56",
+            "lg:static lg:z-auto lg:h-auto lg:w-52 xl:w-56",
+            "bg-white rounded-2xl shadow-sm flex flex-col flex-shrink-0",
+            "transition-transform duration-300 ease-in-out",
+            sidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0",
+          ].join(" ")}
+        >
+          {/* Red logo area */}
+          <div className="bg-[hsl(355,72%,46%)] rounded-t-2xl px-5 py-[1.1rem] flex-shrink-0">
+            <div className="flex items-center justify-between">
+              <span className="text-white font-bold text-xl tracking-widest">SMARTDINI</span>
               <button
-                onClick={() => setOpen(false)}
-                className="p-2 hover:bg-muted rounded-lg"
+                className="lg:hidden text-white"
+                onClick={() => setSidebarOpen(false)}
+                aria-label="Close menu"
               >
-                <X className="h-5 w-5" />
+                <X size={20} />
               </button>
             </div>
-            <div className="p-3">
-              <Navigation onNavigate={() => setOpen(false)} />
-            </div>
           </div>
+
+          {/* Nav links */}
+          <nav className="flex-1 px-3 py-4 space-y-0.5">
+            {navItems.map(({ label, href, icon: Icon }) => {
+              const isActive =
+                href === base
+                  ? pathname === base
+                  : pathname.startsWith(href);
+              return (
+                <Link
+                  key={href}
+                  href={href}
+                  onClick={() => setSidebarOpen(false)}
+                  className={[
+                    "flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-150",
+                    isActive
+                      ? "bg-[hsl(355,72%,92%)] text-[hsl(355,72%,46%)]"
+                      : "text-[hsl(0,0%,30%)] hover:bg-[hsl(0,0%,95%)]",
+                  ].join(" ")}
+                >
+                  <Icon size={18} strokeWidth={isActive ? 2.2 : 1.8} />
+                  {label}
+                </Link>
+              );
+            })}
+          </nav>
+        </aside>
+
+        {/* ─── Main content ─── */}
+        <div className="flex-1 flex flex-col min-w-0">
+          {/* Red top header */}
+          <header className="bg-[hsl(355,72%,46%)] rounded-2xl px-4 sm:px-6 py-[1.1rem] mb-3 sm:mb-4 flex items-center gap-3 flex-shrink-0">
+            <button
+              className="lg:hidden text-white flex-shrink-0"
+              onClick={() => setSidebarOpen(true)}
+              aria-label="Open sidebar"
+            >
+              <Menu size={22} />
+            </button>
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0">
+                <User size={18} className="text-white" />
+              </div>
+              <span className="text-white font-semibold text-base sm:text-lg">
+                Admin Dashboard !
+              </span>
+            </div>
+          </header>
+
+          {/* Page */}
+          <main className="flex-1">{children}</main>
         </div>
-      )}
+      </div>
     </div>
   );
 }

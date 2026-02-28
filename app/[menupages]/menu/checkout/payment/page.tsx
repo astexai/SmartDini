@@ -3,35 +3,43 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, CreditCard, Smartphone, Wallet, CheckCircle } from "lucide-react";
+import { ArrowLeft, Smartphone, Wallet, CheckCircle } from "lucide-react";
 
-type Params = {
-  menupages: string;
-};
+type PaymentMethod = "upi" | "cash";
 
-type PaymentMethod = "upi" | "cod";
+// For Next.js 15, we need to handle params as a Promise
+type PageProps = {
+  params: Promise<{ menupages: string }>
+}
 
-export default function PaymentPage({ params }: { params: Params }) {
+export default async function PaymentPage({ params }: PageProps) {
+  // Unwrap the params Promise
+  const { menupages } = await params;
+  
+  return <PaymentPageContent menupages={menupages} />;
+}
+
+function PaymentPageContent({ menupages }: { menupages: string }) {
   const router = useRouter();
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("upi");
   const [upiId, setUpiId] = useState("");
   const [processing, setProcessing] = useState(false);
   const [paymentComplete, setPaymentComplete] = useState(false);
 
-  const total = 646; // This would come from your cart state
+  const total = 467; // This would come from your cart state
 
   const handlePayment = async () => {
     setProcessing(true);
     
     // Simulate payment processing
-    await new Promise(resolve => setTimeout(resolve, 2000));
+    await new Promise(resolve => setTimeout(resolve, 1500));
     
     setProcessing(false);
     setPaymentComplete(true);
     
     // Redirect to order confirmation after 2 seconds
     setTimeout(() => {
-      router.push(`/${params.menupages}/menu/order-confirmation`);
+      router.push(`/${menupages}/menu/order-confirmation`);
     }, 2000);
   };
 
@@ -67,9 +75,9 @@ export default function PaymentPage({ params }: { params: Params }) {
 
         <div className="p-4 space-y-4">
           {/* Order Total */}
-          <div className="bg-primary/5 rounded-xl p-4">
+          <div className="bg-[#D32F2F]/5 rounded-xl p-4">
             <p className="text-sm text-gray-600 mb-1">Total Amount</p>
-            <p className="text-2xl font-bold text-primary">₹{total}</p>
+            <p className="text-2xl font-bold text-[#D32F2F]">₹{total}</p>
           </div>
 
           {/* Payment Methods */}
@@ -78,7 +86,7 @@ export default function PaymentPage({ params }: { params: Params }) {
             <div className="space-y-3">
               {/* UPI Option */}
               <label className={`block border rounded-xl p-4 cursor-pointer transition-all ${
-                paymentMethod === 'upi' ? 'border-primary bg-primary/5' : 'border-gray-200 bg-white'
+                paymentMethod === 'upi' ? 'border-[#D32F2F] bg-[#D32F2F]/5' : 'border-gray-200 bg-white'
               }`}>
                 <div className="flex items-center gap-3">
                   <input
@@ -87,28 +95,28 @@ export default function PaymentPage({ params }: { params: Params }) {
                     value="upi"
                     checked={paymentMethod === 'upi'}
                     onChange={(e) => setPaymentMethod(e.target.value as PaymentMethod)}
-                    className="w-4 h-4 text-primary"
+                    className="w-4 h-4 text-[#D32F2F]"
                   />
                   <Smartphone className="w-5 h-5 text-gray-600" />
                   <span className="font-medium">UPI</span>
                 </div>
               </label>
 
-              {/* Cash on Delivery Option */}
+              {/* Cash Only Option - Replaced COD */}
               <label className={`block border rounded-xl p-4 cursor-pointer transition-all ${
-                paymentMethod === 'cod' ? 'border-primary bg-primary/5' : 'border-gray-200 bg-white'
+                paymentMethod === 'cash' ? 'border-[#D32F2F] bg-[#D32F2F]/5' : 'border-gray-200 bg-white'
               }`}>
                 <div className="flex items-center gap-3">
                   <input
                     type="radio"
                     name="payment"
-                    value="cod"
-                    checked={paymentMethod === 'cod'}
+                    value="cash"
+                    checked={paymentMethod === 'cash'}
                     onChange={(e) => setPaymentMethod(e.target.value as PaymentMethod)}
-                    className="w-4 h-4 text-primary"
+                    className="w-4 h-4 text-[#D32F2F]"
                   />
                   <Wallet className="w-5 h-5 text-gray-600" />
-                  <span className="font-medium">Cash on Delivery</span>
+                  <span className="font-medium">Cash Only</span>
                 </div>
               </label>
             </div>
@@ -124,7 +132,7 @@ export default function PaymentPage({ params }: { params: Params }) {
                   placeholder="Enter UPI ID (e.g., name@okhdfcbank)"
                   value={upiId}
                   onChange={(e) => setUpiId(e.target.value)}
-                  className="w-full px-4 py-3 bg-white border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20"
+                  className="w-full px-4 py-3 bg-white border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#D32F2F]/20"
                 />
                 <div className="grid grid-cols-3 gap-2">
                   {['gpay@okhdfcbank', 'phonepe@ybl', 'paytm@okhdfcbank'].map((id) => (
@@ -137,24 +145,20 @@ export default function PaymentPage({ params }: { params: Params }) {
                     </button>
                   ))}
                 </div>
-                <div className="bg-blue-50 rounded-lg p-3">
-                  <p className="text-xs text-blue-700">
-                    <span className="font-semibold">Demo:</span> You can use any UPI ID for testing
-                  </p>
-                </div>
               </div>
             </div>
           )}
 
-          {/* COD Info - Show only if COD selected */}
-          {paymentMethod === 'cod' && (
+          {/* Cash Only Info */}
+          {paymentMethod === 'cash' && (
             <div className="bg-amber-50 rounded-xl p-4">
               <div className="flex items-start gap-3">
                 <Wallet className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
                 <div>
-                  <h3 className="font-semibold text-amber-800 mb-1">Cash on Delivery</h3>
+                  <h3 className="font-semibold text-amber-800 mb-1">Cash Only</h3>
                   <p className="text-xs text-amber-700">
-                    Pay ₹{total} in cash when your order arrives. Please keep exact change if possible.
+                    Please pay ₹{total} in cash at the counter or to the delivery person. 
+                    Exact change is appreciated.
                   </p>
                 </div>
               </div>
@@ -165,7 +169,7 @@ export default function PaymentPage({ params }: { params: Params }) {
           <button
             onClick={handlePayment}
             disabled={processing || (paymentMethod === 'upi' && !upiId)}
-            className="w-full bg-primary text-white py-4 rounded-xl font-semibold hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full bg-[#D32F2F] text-white py-4 rounded-xl font-semibold hover:bg-[#B71C1C] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {processing ? (
               <span className="flex items-center justify-center gap-2">

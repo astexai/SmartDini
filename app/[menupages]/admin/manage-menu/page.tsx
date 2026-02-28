@@ -1,245 +1,281 @@
 "use client";
 
-import { useState } from "react";
-import { Plus, Trash2, Edit2, Save, X, Upload } from "lucide-react";
+import { useState, useRef } from "react";
+import { UtensilsCrossed, ImageIcon, Pencil, Trash2, X, ChevronDown } from "lucide-react";
 
 type MenuItem = {
   id: number;
   name: string;
   price: number;
-  category: "Pizza" | "Burger" | "Beverages" | "Sides";
-  image?: string;
+  category: string;
+  editing?: boolean;
+  editName?: string;
+  editPrice?: number;
+  editCategory?: string;
 };
 
+const CATEGORIES = ["Pizza", "Burger", "Pasta", "Drinks", "Desserts"];
+
+const SEED: MenuItem[] = [
+  { id: 1, name: "Pizza Marinara",   price: 199, category: "Pizza"  },
+  { id: 2, name: "Pizza Margherita", price: 200, category: "Pizza"  },
+  { id: 3, name: "Chicago Pizza",    price: 399, category: "Pizza"  },
+  { id: 4, name: "Veggie burger",    price: 159, category: "Burger" },
+  { id: 5, name: "Turkey burger",    price: 299, category: "Burger" },
+  { id: 6, name: "Cheeseburger",     price: 149, category: "Burger" },
+];
+
 export default function ManageMenuPage() {
-  const [items, setItems] = useState<MenuItem[]>([
-    { id: 1, name: "Pizza Marinara", price: 199, category: "Pizza" },
-    { id: 2, name: "Pizza Margherita", price: 250, category: "Pizza" },
-    { id: 3, name: "Chicago Pizza", price: 399, category: "Pizza" },
-    { id: 4, name: "Veggie Burger", price: 159, category: "Burger" },
-    { id: 5, name: "Turkey Burger", price: 299, category: "Burger" },
-    { id: 6, name: "Cheeseburger", price: 149, category: "Burger" },
-  ]);
+  const [menu, setMenu]             = useState<MenuItem[]>(SEED);
+  const [itemName, setItemName]     = useState("");
+  const [price, setPrice]           = useState("");
+  const [category, setCategory]     = useState("");
+  const [imgPreview, setImgPreview] = useState<string | null>(null);
+  const fileRef                     = useRef<HTMLInputElement>(null);
 
-  const [newItem, setNewItem] = useState<Partial<MenuItem>>({
-    name: "",
-    price: 0,
-    category: "Pizza",
-  });
+  /* ── helpers ── */
+  const updateItem = (id: number, patch: Partial<MenuItem>) =>
+    setMenu((p) => p.map((m) => (m.id === id ? { ...m, ...patch } : m)));
 
-  const [editingId, setEditingId] = useState<number | null>(null);
-  const [editForm, setEditForm] = useState<Partial<MenuItem>>({});
-
-  const handleAddItem = () => {
-    if (!newItem.name || !newItem.price) return;
-    
-    setItems([
-      { ...newItem as MenuItem, id: Date.now() },
-      ...items
+  const handleAdd = () => {
+    if (!itemName.trim() || !price || !category) return;
+    setMenu((p) => [
+      ...p,
+      { id: Date.now(), name: itemName.trim(), price: Number(price), category },
     ]);
-    
-    setNewItem({ name: "", price: 0, category: "Pizza" });
+    setItemName(""); setPrice(""); setCategory(""); setImgPreview(null);
   };
 
-  const handleDelete = (id: number) => {
-    setItems(items.filter(item => item.id !== id));
+  const startEdit = (id: number) => {
+    const item = menu.find((m) => m.id === id)!;
+    updateItem(id, { editing: true, editName: item.name, editPrice: item.price, editCategory: item.category });
   };
 
-  const startEdit = (item: MenuItem) => {
-    setEditingId(item.id);
-    setEditForm(item);
+  const saveEdit = (id: number) => {
+    const item = menu.find((m) => m.id === id)!;
+    updateItem(id, {
+      editing: false,
+      name: item.editName || item.name,
+      price: item.editPrice ?? item.price,
+      category: item.editCategory || item.category,
+    });
   };
 
-  const saveEdit = () => {
-    if (!editingId || !editForm.name || !editForm.price) return;
-    
-    setItems(items.map(item => 
-      item.id === editingId ? { ...item, ...editForm } : item
-    ));
-    
-    setEditingId(null);
-    setEditForm({});
-  };
-
-  const cancelEdit = () => {
-    setEditingId(null);
-    setEditForm({});
-  };
+  const cancelEdit = (id: number) => updateItem(id, { editing: false });
+  const deleteItem  = (id: number) => setMenu((p) => p.filter((m) => m.id !== id));
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h2 className="text-2xl font-bold">Menu Management</h2>
-        <p className="text-sm text-muted-foreground mt-1">Add, edit, or remove menu items</p>
-      </div>
+    <div className="bg-white rounded-2xl p-4 sm:p-6 shadow-sm">
+      <h2 className="text-base sm:text-lg font-bold text-[hsl(0,0%,13%)] mb-5">
+        Menu Management
+      </h2>
 
-      {/* Add Menu Section */}
-      <div className="bg-white rounded-xl border p-6">
-        <h3 className="font-semibold mb-4 flex items-center gap-2">
-          <Plus className="h-4 w-4" /> Add New Item
-        </h3>
-        
-        <div className="grid lg:grid-cols-2 gap-6">
-          {/* Image Upload Placeholder */}
-          <div className="border-2 border-dashed rounded-xl p-8 flex flex-col items-center justify-center text-center bg-muted/20">
-            <Upload className="h-8 w-8 text-muted-foreground mb-2" />
-            <p className="text-sm font-medium">Click to upload image</p>
-            <p className="text-xs text-muted-foreground mt-1">PNG, JPG up to 10MB</p>
+      {/* ── Add Menu ── */}
+      <section className="mb-7">
+        <div className="flex items-center gap-2 mb-3">
+          <div className="w-8 h-8 rounded-xl bg-[hsl(355,72%,93%)] flex items-center justify-center">
+            <UtensilsCrossed size={16} className="text-[hsl(355,72%,46%)]" />
           </div>
+          <h3 className="font-bold text-sm sm:text-base text-[hsl(0,0%,13%)]">Add Menu</h3>
+        </div>
 
-          {/* Form Fields */}
-          <div className="space-y-4">
-            <div>
-              <label className="text-sm font-medium mb-1 block">Item Name</label>
+        <div className="bg-[hsl(0,0%,96%)] rounded-2xl p-4">
+          <div className="flex flex-col sm:flex-row gap-4">
+            {/* Image drop zone */}
+            <div
+              onClick={() => fileRef.current?.click()}
+              className="w-full sm:w-40 h-36 border-2 border-dashed border-[hsl(355,72%,68%)] rounded-xl flex flex-col items-center justify-center cursor-pointer bg-white hover:bg-[hsl(355,72%,98%)] transition-colors flex-shrink-0 overflow-hidden"
+            >
+              {imgPreview ? (
+                <img src={imgPreview} alt="preview" className="w-full h-full object-cover" />
+              ) : (
+                <>
+                  <div className="w-10 h-10 rounded-full bg-[hsl(355,72%,93%)] flex items-center justify-center mb-2">
+                    <ImageIcon size={20} className="text-[hsl(355,72%,55%)]" />
+                  </div>
+                  <p className="text-xs text-[hsl(0,0%,40%)] text-center leading-tight px-2">
+                    Click to upload image
+                  </p>
+                  <p className="text-[11px] text-[hsl(0,0%,60%)] mt-0.5">PNG, JPG upto 10 MB</p>
+                </>
+              )}
               <input
-                type="text"
-                placeholder="eg. margherita pizza"
-                className="w-full px-4 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-primary/20"
-                value={newItem.name}
-                onChange={(e) => setNewItem({ ...newItem, name: e.target.value })}
+                ref={fileRef}
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={(e) => {
+                  const f = e.target.files?.[0];
+                  if (f) setImgPreview(URL.createObjectURL(f));
+                }}
               />
             </div>
-            
-            <div className="grid grid-cols-2 gap-3">
+
+            {/* Form */}
+            <div className="flex-1 flex flex-col gap-3">
               <div>
-                <label className="text-sm font-medium mb-1 block">Price (₹)</label>
+                <label className="block text-xs font-medium text-[hsl(0,0%,30%)] mb-1">
+                  Item Name
+                </label>
                 <input
-                  type="number"
-                  placeholder="eg. 1.49"
-                  className="w-full px-4 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-primary/20"
-                  value={newItem.price || ""}
-                  onChange={(e) => setNewItem({ ...newItem, price: Number(e.target.value) })}
+                  type="text"
+                  placeholder="eg.: margherita pizza"
+                  value={itemName}
+                  onChange={(e) => setItemName(e.target.value)}
+                  className="w-full border border-[hsl(0,0%,84%)] rounded-lg px-3 py-2 text-sm bg-white outline-none focus:border-[hsl(355,72%,46%)] focus:ring-1 focus:ring-[hsl(355,72%,46%)]"
                 />
               </div>
-              
+
               <div>
-                <label className="text-sm font-medium mb-1 block">Category</label>
-                <select
-                  className="w-full px-4 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-primary/20"
-                  value={newItem.category}
-                  onChange={(e) => setNewItem({ ...newItem, category: e.target.value as MenuItem["category"] })}
+                <label className="block text-xs font-medium text-[hsl(0,0%,30%)] mb-1">
+                  Price ₹
+                </label>
+                <input
+                  type="number"
+                  placeholder="eg.: 149"
+                  value={price}
+                  onChange={(e) => setPrice(e.target.value)}
+                  className="w-full border border-[hsl(0,0%,84%)] rounded-lg px-3 py-2 text-sm bg-white outline-none focus:border-[hsl(355,72%,46%)] focus:ring-1 focus:ring-[hsl(355,72%,46%)]"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-medium text-[hsl(0,0%,30%)] mb-1">
+                  Category
+                </label>
+                <div className="relative">
+                  <select
+                    value={category}
+                    onChange={(e) => setCategory(e.target.value)}
+                    className="w-full border border-[hsl(0,0%,84%)] rounded-lg px-3 py-2 text-sm bg-white appearance-none outline-none focus:border-[hsl(355,72%,46%)] focus:ring-1 focus:ring-[hsl(355,72%,46%)] text-[hsl(0,0%,50%)]"
+                  >
+                    <option value="">Select Category</option>
+                    {CATEGORIES.map((c) => <option key={c} value={c}>{c}</option>)}
+                  </select>
+                  <ChevronDown size={13} className="absolute right-3 top-1/2 -translate-y-1/2 text-[hsl(0,0%,50%)] pointer-events-none" />
+                </div>
+              </div>
+
+              <div className="flex justify-end">
+                <button
+                  onClick={handleAdd}
+                  className="bg-[hsl(151,100%,37%)] text-white text-sm font-semibold px-6 py-2 rounded-lg hover:bg-[hsl(151,100%,31%)] transition-colors"
                 >
-                  <option value="Pizza">Pizza</option>
-                  <option value="Burger">Burger</option>
-                  <option value="Beverages">Beverages</option>
-                  <option value="Sides">Sides</option>
-                </select>
+                  Save
+                </button>
               </div>
             </div>
-            
-            <button
-              onClick={handleAddItem}
-              className="w-full bg-primary text-primary-foreground px-4 py-2.5 rounded-lg font-medium hover:bg-primary/90 transition-colors"
-            >
-              Save Item
-            </button>
           </div>
         </div>
-      </div>
+      </section>
 
-      {/* Menu Items Table */}
-      <div className="bg-white rounded-xl border overflow-hidden">
-        <div className="p-4 border-b bg-muted/5">
-          <h3 className="font-semibold">Current Menu Items</h3>
+      {/* ── Manage Menu table ── */}
+      <section>
+        <div className="flex items-center gap-2 mb-3">
+          <div className="w-8 h-8 rounded-xl bg-[hsl(355,72%,93%)] flex items-center justify-center">
+            <UtensilsCrossed size={16} className="text-[hsl(355,72%,46%)]" />
+          </div>
+          <h3 className="font-bold text-sm sm:text-base text-[hsl(0,0%,13%)]">Manage Menu</h3>
         </div>
-        
-        <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead className="bg-muted/30">
-              <tr>
-                <th className="text-left px-6 py-3 text-sm font-medium">Item Name</th>
-                <th className="text-left px-6 py-3 text-sm font-medium">Price (₹)</th>
-                <th className="text-left px-6 py-3 text-sm font-medium">Category</th>
-                <th className="text-left px-6 py-3 text-sm font-medium">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y">
-              {items.map((item) => (
-                <tr key={item.id} className="hover:bg-muted/10">
-                  {editingId === item.id ? (
+
+        {/* Scrollable on small screens */}
+        <div className="overflow-x-auto rounded-2xl">
+          <div className="min-w-[480px]">
+            {/* Table header */}
+            <div className="grid grid-cols-4 bg-[hsl(355,72%,46%)] text-white text-sm font-semibold rounded-t-2xl">
+              <div className="px-4 py-3">Item Name</div>
+              <div className="px-4 py-3 text-center">Price ₹</div>
+              <div className="px-4 py-3 text-center">Category</div>
+              <div className="px-4 py-3 text-center">Action</div>
+            </div>
+
+            {/* Rows */}
+            <div className="rounded-b-2xl overflow-hidden border border-t-0 border-[hsl(0,3%,65%)]">
+              {menu.map((item, idx) => (
+                <div
+                  key={item.id}
+                  className={[
+                    "grid grid-cols-4 items-center text-sm border-b border-[hsl(0,0%,58%)] last:border-0",
+                    item.editing
+                      ? "bg-[hsl(355,72%,98%)]"
+                      : idx % 2 === 0 ? "bg-white" : "bg-[hsl(0,0%,97%)]",
+                  ].join(" ")}
+                >
+                  {item.editing ? (
                     <>
-                      <td className="px-6 py-3">
+                      {/* Editing row */}
+                      <div className="px-3 py-2">
                         <input
-                          type="text"
-                          className="w-full px-2 py-1 border rounded"
-                          value={editForm.name || ""}
-                          onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
+                          value={item.editName}
+                          onChange={(e) => updateItem(item.id, { editName: e.target.value })}
+                          className="w-full border border-[hsl(355,72%,60%)] rounded px-2 py-1 text-xs text-[hsl(355,72%,46%)] outline-none"
                         />
-                      </td>
-                      <td className="px-6 py-3">
+                      </div>
+                      <div className="px-3 py-2">
                         <input
                           type="number"
-                          className="w-24 px-2 py-1 border rounded"
-                          value={editForm.price || 0}
-                          onChange={(e) => setEditForm({ ...editForm, price: Number(e.target.value) })}
+                          value={item.editPrice}
+                          onChange={(e) => updateItem(item.id, { editPrice: Number(e.target.value) })}
+                          className="w-full border border-[hsl(355,72%,60%)] rounded px-2 py-1 text-xs text-center text-[hsl(355,72%,46%)] outline-none"
                         />
-                      </td>
-                      <td className="px-6 py-3">
-                        <select
-                          className="px-2 py-1 border rounded"
-                          value={editForm.category}
-                          onChange={(e) => setEditForm({ ...editForm, category: e.target.value as MenuItem["category"] })}
-                        >
-                          <option value="Pizza">Pizza</option>
-                          <option value="Burger">Burger</option>
-                          <option value="Beverages">Beverages</option>
-                          <option value="Sides">Sides</option>
-                        </select>
-                      </td>
-                      <td className="px-6 py-3">
-                        <div className="flex gap-2">
-                          <button
-                            onClick={saveEdit}
-                            className="p-1.5 bg-primary text-white rounded-lg hover:bg-primary/90"
+                      </div>
+                      <div className="px-3 py-2">
+                        <div className="relative">
+                          <select
+                            value={item.editCategory}
+                            onChange={(e) => updateItem(item.id, { editCategory: e.target.value })}
+                            className="w-full border border-[hsl(355,72%,60%)] rounded px-2 py-1 text-xs text-[hsl(355,72%,46%)] appearance-none outline-none"
                           >
-                            <Save className="h-4 w-4" />
-                          </button>
-                          <button
-                            onClick={cancelEdit}
-                            className="p-1.5 bg-gray-200 rounded-lg hover:bg-gray-300"
-                          >
-                            <X className="h-4 w-4" />
-                          </button>
+                            {CATEGORIES.map((c) => <option key={c} value={c}>{c}</option>)}
+                          </select>
+                          <ChevronDown size={10} className="absolute right-1.5 top-1/2 -translate-y-1/2 pointer-events-none text-[hsl(355,72%,46%)]" />
                         </div>
-                      </td>
+                      </div>
+                      <div className="px-3 py-2 flex items-center justify-center gap-1.5">
+                        <button
+                          onClick={() => saveEdit(item.id)}
+                          className="bg-[hsl(151,100%,37%)] text-white text-xs font-semibold px-2.5 py-1 rounded-md hover:bg-[hsl(151,100%,31%)] transition-colors"
+                        >
+                          Save
+                        </button>
+                        <button
+                          onClick={() => cancelEdit(item.id)}
+                          className="bg-[hsl(355,72%,46%)] text-white text-xs font-semibold px-2.5 py-1 rounded-md hover:bg-[hsl(355,72%,40%)] transition-colors"
+                        >
+                          Cancel
+                        </button>
+                      </div>
                     </>
                   ) : (
                     <>
-                      <td className="px-6 py-3 font-medium">{item.name}</td>
-                      <td className="px-6 py-3">₹{item.price}</td>
-                      <td className="px-6 py-3">
-                        <span className={`px-2 py-1 rounded-full text-xs ${
-                          item.category === 'Pizza' ? 'bg-orange-100 text-orange-700' :
-                          item.category === 'Burger' ? 'bg-amber-100 text-amber-700' :
-                          'bg-blue-100 text-blue-700'
-                        }`}>
-                          {item.category}
-                        </span>
-                      </td>
-                      <td className="px-6 py-3">
-                        <div className="flex gap-2">
-                          <button
-                            onClick={() => startEdit(item)}
-                            className="p-1.5 bg-gray-200 rounded-lg hover:bg-gray-300"
-                          >
-                            <Edit2 className="h-4 w-4" />
-                          </button>
-                          <button
-                            onClick={() => handleDelete(item.id)}
-                            className="p-1.5 bg-red-500 text-white rounded-lg hover:bg-red-600"
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </button>
-                        </div>
-                      </td>
+                      {/* Normal row */}
+                      <div className="px-4 py-3 font-medium text-[hsl(0,0%,18%)]">{item.name}</div>
+                      <div className="px-4 py-3 text-center text-[hsl(0,0%,30%)]">{item.price}</div>
+                      <div className="px-4 py-3 text-center text-[hsl(0,0%,30%)]">{item.category}</div>
+                      <div className="px-4 py-3 flex items-center justify-center gap-2">
+                        <button
+                          onClick={() => startEdit(item.id)}
+                          className="w-7 h-7 bg-[hsl(151,60%,90%)] rounded-full flex items-center justify-center hover:bg-[hsl(151,60%,82%)] transition-colors"
+                          aria-label="Edit"
+                        >
+                          <Pencil size={13} className="text-[hsl(151,100%,28%)]" />
+                        </button>
+                        <button
+                          onClick={() => deleteItem(item.id)}
+                          className="w-7 h-7 bg-[hsl(355,72%,92%)] rounded-full flex items-center justify-center hover:bg-[hsl(355,72%,85%)] transition-colors"
+                          aria-label="Delete"
+                        >
+                          <Trash2 size={13} className="text-[hsl(355,72%,46%)]" />
+                        </button>
+                      </div>
                     </>
                   )}
-                </tr>
+                </div>
               ))}
-            </tbody>
-          </table>
+            </div>
+          </div>
         </div>
-      </div>
+      </section>
     </div>
   );
 }

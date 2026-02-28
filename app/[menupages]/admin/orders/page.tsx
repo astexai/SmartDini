@@ -1,189 +1,172 @@
 "use client";
 
-import { useState } from "react";
-import { Clock, CheckCircle, RefreshCw } from "lucide-react";
+import { Package, Clock, ShoppingCart, CheckCircle, ChevronDown } from "lucide-react";
 
+type OrderItem = { id: number; name: string; price: number };
 type Order = {
-  id: number;
-  orderNumber: string;
-  items: string[];
+  id: string;
+  number: number;
+  time: string;
+  table: string;
   total: number;
   status: "pending" | "completed";
-  customer: string;
-  time: string;
+  items: OrderItem[];
 };
 
-export default function OrdersPage() {
-  const [pendingOrders, setPendingOrders] = useState<Order[]>([
-    {
-      id: 1,
-      orderNumber: "#1001",
-      items: ["Chicken Burger", "French Fries"],
-      total: 497,
-      status: "pending",
-      customer: "John Doe",
-      time: "10:30 AM"
-    },
-    {
-      id: 2,
-      orderNumber: "#1002",
-      items: ["Margherita Pizza"],
-      total: 399,
-      status: "pending",
-      customer: "Jane Smith",
-      time: "10:45 AM"
-    },
-    {
-      id: 3,
-      orderNumber: "#1003",
-      items: ["Veggie Burger", "Coke"],
-      total: 259,
-      status: "pending",
-      customer: "Mike Johnson",
-      time: "11:00 AM"
-    }
-  ]);
+const ORDERS: Order[] = [
+  {
+    id: "6", number: 6, time: "10:30 PM", table: "Table 001", total: 497, status: "pending",
+    items: [
+      { id: 1, name: "Chicken Burger", price: 199 },
+      { id: 2, name: "Chicken Burger", price: 199 },
+      { id: 4, name: "Chicken Burger", price: 199 },
+    ],
+  },
+  {
+    id: "5", number: 5, time: "10:30 PM", table: "Table 001", total: 497, status: "pending",
+    items: [
+      { id: 1, name: "Chicken Burger", price: 199 },
+      { id: 2, name: "Chicken Burger", price: 199 },
+      { id: 4, name: "Chicken Burger", price: 199 },
+    ],
+  },
+  {
+    id: "4", number: 4, time: "10:30 PM", table: "Table 001", total: 497, status: "pending",
+    items: [
+      { id: 1, name: "Chicken Burger", price: 199 },
+      { id: 2, name: "Chicken Burger", price: 199 },
+      { id: 4, name: "Chicken Burger", price: 199 },
+    ],
+  },
+  {
+    id: "3", number: 3, time: "10:30 PM", table: "Table 001", total: 497, status: "completed",
+    items: [
+      { id: 1, name: "Chicken Burger", price: 199 },
+      { id: 2, name: "Chicken Burger", price: 199 },
+      { id: 4, name: "Chicken Burger", price: 199 },
+    ],
+  },
+  {
+    id: "2", number: 2, time: "10:30 PM", table: "Table 001", total: 497, status: "completed",
+    items: [
+      { id: 1, name: "Chicken Burger", price: 199 },
+      { id: 2, name: "Chicken Burger", price: 199 },
+      { id: 4, name: "Chicken Burger", price: 199 },
+    ],
+  },
+  {
+    id: "1", number: 1, time: "10:30 PM", table: "Table 001", total: 497, status: "completed",
+    items: [
+      { id: 1, name: "Chicken Burger", price: 199 },
+      { id: 2, name: "Chicken Burger", price: 199 },
+      { id: 4, name: "Chicken Burger", price: 199 },
+    ],
+  },
+];
 
-  const [completedOrders, setCompletedOrders] = useState<Order[]>([
-    {
-      id: 4,
-      orderNumber: "#998",
-      items: ["Chicago Pizza", "Garlic Bread"],
-      total: 549,
-      status: "completed",
-      customer: "Sarah Wilson",
-      time: "09:15 AM"
-    },
-    {
-      id: 5,
-      orderNumber: "#999",
-      items: ["Cheeseburger", "Onion Rings"],
-      total: 329,
-      status: "completed",
-      customer: "Tom Brown",
-      time: "09:30 AM"
-    }
-  ]);
-
-  const markAsCompleted = (order: Order) => {
-    setPendingOrders(pendingOrders.filter(o => o.id !== order.id));
-    setCompletedOrders([{ ...order, status: "completed" }, ...completedOrders]);
-  };
-
-  const reopenOrder = (order: Order) => {
-    setCompletedOrders(completedOrders.filter(o => o.id !== order.id));
-    setPendingOrders([{ ...order, status: "pending" }, ...pendingOrders]);
-  };
+function OrderCard({ order }: { order: Order }) {
+  const isPending = order.status === "pending";
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h2 className="text-2xl font-bold">Orders Management</h2>
-        <p className="text-sm text-muted-foreground mt-1">Track and manage all orders</p>
-      </div>
-
-      {/* Stats */}
-      <div className="grid grid-cols-2 gap-4">
-        <div className="bg-amber-50 rounded-xl border border-amber-200 p-4">
-          <p className="text-sm text-amber-600 flex items-center gap-1">
-            <Clock className="h-4 w-4" /> Pending Orders
-          </p>
-          <p className="text-2xl font-bold text-amber-700 mt-1">{pendingOrders.length}</p>
-        </div>
-        <div className="bg-emerald-50 rounded-xl border border-emerald-200 p-4">
-          <p className="text-sm text-emerald-600 flex items-center gap-1">
-            <CheckCircle className="h-4 w-4" /> Completed
-          </p>
-          <p className="text-2xl font-bold text-emerald-700 mt-1">{completedOrders.length}</p>
-        </div>
-      </div>
-
-      {/* Orders Grid */}
-      <div className="grid lg:grid-cols-2 gap-6">
-        {/* Pending Orders */}
-        <div className="bg-white rounded-xl border">
-          <div className="p-4 border-b bg-amber-50/50">
-            <div className="flex items-center justify-between">
-              <h3 className="font-semibold flex items-center gap-2">
-                <Clock className="h-4 w-4 text-amber-500" />
-                Pending Orders
-              </h3>
-              <span className="text-xs bg-amber-100 text-amber-700 px-2 py-1 rounded-full">
-                In Progress
-              </span>
+    <div className="bg-white rounded-2xl overflow-hidden shadow-sm mb-3 border border-[hsl(0,0%,93%)]">
+      {/* Header */}
+      <div className="flex flex-wrap items-center justify-between gap-2 px-4 py-3 bg-[hsl(0,0%,95%)] rounded-t-2xl">
+        <div className="flex items-center gap-3">
+          <div className="w-8 h-8 rounded-xl bg-[hsl(355,60%,80%)] flex items-center justify-center flex-shrink-0">
+            <Package size={15} className="text-[hsl(355,72%,46%)]" />
+          </div>
+          <div>
+            <p className="font-semibold text-sm text-[hsl(0,0%,13%)]">
+              Order #{order.number}
+            </p>
+            <div className="flex items-center gap-1.5 text-[11px] text-[hsl(0,0%,55%)] mt-0.5">
+              <Clock size={9} />
+              <span>{order.time}</span>
+              <span>•</span>
+              <ShoppingCart size={9} />
+              <span>{order.table}</span>
             </div>
           </div>
-          <div className="p-4 space-y-3">
-            {pendingOrders.map((order) => (
-              <div key={order.id} className="border rounded-lg p-3 hover:shadow-sm transition-shadow">
-                <div className="flex items-start justify-between">
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <span className="font-semibold">{order.orderNumber}</span>
-                      <span className="text-xs text-muted-foreground">{order.time}</span>
-                    </div>
-                    <p className="text-sm text-muted-foreground mt-1">{order.items.join(" • ")}</p>
-                    <p className="text-xs text-muted-foreground mt-1">Customer: {order.customer}</p>
-                  </div>
-                  <div className="text-right">
-                    <p className="font-bold">₹{order.total}</p>
-                    <button
-                      onClick={() => markAsCompleted(order)}
-                      className="mt-2 px-3 py-1 bg-emerald-500 text-white rounded-lg text-xs hover:bg-emerald-600 transition-colors"
-                    >
-                      Mark Complete
-                    </button>
-                  </div>
-                </div>
-              </div>
-            ))}
-            {pendingOrders.length === 0 && (
-              <p className="text-center text-muted-foreground py-8">No pending orders</p>
-            )}
-          </div>
         </div>
 
-        {/* Completed Orders */}
-        <div className="bg-white rounded-xl border">
-          <div className="p-4 border-b bg-emerald-50/50">
-            <div className="flex items-center justify-between">
-              <h3 className="font-semibold flex items-center gap-2">
-                <CheckCircle className="h-4 w-4 text-emerald-500" />
-                Completed Orders
-              </h3>
-              <span className="text-xs bg-emerald-100 text-emerald-700 px-2 py-1 rounded-full">
-                Completed
-              </span>
-            </div>
+        <div className="flex items-center gap-2 flex-shrink-0">
+          <span className="font-bold text-sm text-[hsl(0,0%,13%)]">₹{order.total}</span>
+          <button
+            className={[
+              "flex items-center gap-1 text-xs font-semibold px-3 py-1.5 rounded-lg border",
+              isPending
+                ? "bg-[hsl(40,100%,93%)] text-[hsl(35,90%,38%)] border-[hsl(40,80%,78%)]"
+                : "bg-[hsl(151,60%,91%)] text-[hsl(151,100%,28%)] border-[hsl(151,50%,70%)]",
+            ].join(" ")}
+          >
+            {isPending ? <Clock size={10} /> : <CheckCircle size={10} />}
+            {isPending ? "Pending" : "Completed"}
+            <ChevronDown size={10} />
+          </button>
+        </div>
+      </div>
+
+      {/* Items */}
+      <div className="divide-y divide-[hsl(0,1%,74%)]">
+        {order.items.map((item) => (
+          <div
+            key={`${order.id}-${item.id}`}
+            className="flex items-center justify-between px-4 py-2"
+          >
+            <span className="text-sm text-[hsl(0,0%,22%)]">{item.name}</span>
+            <span className="text-sm text-[hsl(0,0%,45%)]">₹{item.price}</span>
           </div>
-          <div className="p-4 space-y-3">
-            {completedOrders.map((order) => (
-              <div key={order.id} className="border rounded-lg p-3 hover:shadow-sm transition-shadow">
-                <div className="flex items-start justify-between">
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <span className="font-semibold">{order.orderNumber}</span>
-                      <span className="text-xs text-muted-foreground">{order.time}</span>
-                    </div>
-                    <p className="text-sm text-muted-foreground mt-1">{order.items.join(" • ")}</p>
-                    <p className="text-xs text-muted-foreground mt-1">Customer: {order.customer}</p>
-                  </div>
-                  <div className="text-right">
-                    <p className="font-bold">₹{order.total}</p>
-                    <button
-                      onClick={() => reopenOrder(order)}
-                      className="mt-2 px-3 py-1 bg-amber-500 text-white rounded-lg text-xs hover:bg-amber-600 transition-colors flex items-center gap-1"
-                    >
-                      <RefreshCw className="h-3 w-3" /> Reopen
-                    </button>
-                  </div>
-                </div>
-              </div>
-            ))}
-            {completedOrders.length === 0 && (
-              <p className="text-center text-muted-foreground py-8">No completed orders</p>
-            )}
+        ))}
+      </div>
+    </div>
+  );
+}
+
+export default function OrdersPage() {
+  const pending = ORDERS.filter((o) => o.status === "pending");
+  const completed = ORDERS.filter((o) => o.status === "completed");
+
+  return (
+    <div className="bg-white rounded-2xl p-4 sm:p-6 shadow-sm">
+      {/* Title row */}
+      <div className="flex flex-wrap items-center justify-between gap-3 mb-5">
+        <h2 className="text-base sm:text-lg font-bold text-[hsl(0,0%,13%)]">
+          Orders Management
+        </h2>
+        <div className="flex items-center gap-2">
+          <span className="flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-full bg-[hsl(151,60%,91%)] text-[hsl(151,100%,28%)] border border-[hsl(151,50%,70%)]">
+            <CheckCircle size={11} />
+            {completed.length} Completed
+          </span>
+          <span className="flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-full bg-[hsl(40,100%,93%)] text-[hsl(35,90%,38%)] border border-[hsl(40,80%,78%)]">
+            <Clock size={11} />
+            {pending.length} Pending
+          </span>
+        </div>
+      </div>
+
+      {/* Two-column grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+        {/* Pending column */}
+        <div>
+          <div className="flex items-center gap-2 mb-3">
+            <Clock size={15} className="text-[hsl(355,72%,46%)]" />
+            <h3 className="font-bold text-sm text-[hsl(0,0%,13%)]">Pending Orders</h3>
           </div>
+          {pending.map((order) => (
+            <OrderCard key={order.id} order={order} />
+          ))}
+        </div>
+
+        {/* Completed column */}
+        <div>
+          <div className="flex items-center gap-2 mb-3">
+            <CheckCircle size={15} className="text-[hsl(151,100%,37%)]" />
+            <h3 className="font-bold text-sm text-[hsl(0,0%,13%)]">Completed Orders</h3>
+          </div>
+          {completed.map((order) => (
+            <OrderCard key={order.id} order={order} />
+          ))}
         </div>
       </div>
     </div>

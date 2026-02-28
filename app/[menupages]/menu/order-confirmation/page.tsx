@@ -4,11 +4,19 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { CheckCircle, ShoppingBag, Home } from "lucide-react";
 
-type Params = {
-  menupages: string;
-};
+// For Next.js 15, we need to handle params as a Promise
+type PageProps = {
+  params: Promise<{ menupages: string }>
+}
 
-export default function OrderConfirmationPage({ params }: { params: Params }) {
+export default async function OrderConfirmationPage({ params }: PageProps) {
+  // Unwrap the params Promise
+  const { menupages } = await params;
+  
+  return <OrderConfirmationPageContent menupages={menupages} />;
+}
+
+function OrderConfirmationPageContent({ menupages }: { menupages: string }) {
   const router = useRouter();
 
   return (
@@ -20,15 +28,15 @@ export default function OrderConfirmationPage({ params }: { params: Params }) {
           </div>
           
           <h1 className="text-2xl font-bold mb-2 text-center">Order Confirmed!</h1>
-          <p className="text-gray-600 text-center mb-2">Order #ORD-2024-001</p>
+          <p className="text-gray-600 text-center mb-2">Order #ORD-{Math.floor(1000 + Math.random() * 9000)}</p>
           <p className="text-sm text-gray-500 text-center mb-8">
             Your order has been placed successfully. We'll notify you when it's ready.
           </p>
 
           <div className="w-full space-y-3">
             <Link
-              href={`/${params.menupages}/menu`}
-              className="block w-full bg-primary text-white text-center py-3.5 rounded-xl font-semibold hover:bg-primary/90 transition-colors"
+              href={`/${menupages}/menu`}
+              className="block w-full bg-[#D32F2F] text-white text-center py-3.5 rounded-xl font-semibold hover:bg-[#B71C1C] transition-colors"
             >
               <ShoppingBag className="w-5 h-5 inline mr-2" />
               Order More
