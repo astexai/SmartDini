@@ -1,3 +1,4 @@
+
 "use client";
 
 import Link from "next/link";
@@ -16,76 +17,78 @@ import {
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const params = useParams();
-  const menupages = params?.menupages as string;
+  const menupages = params?.menupages; // Add default if needed
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
-  const base = `/${menupages}/admin`;
+  // Fallback if params aren't ready yet
+  const base = menupages ? `/${menupages}/admin` : "/admin";
 
   const navItems = [
-    { label: "Dashboard",   href: base,                    icon: LayoutDashboard },
-    { label: "New Orders",  href: `${base}/new-orders`,    icon: Bell },
-    { label: "Orders",      href: `${base}/orders`,        icon: ClipboardList },
-    { label: "Manage Menu", href: `${base}/manage-menu`,   icon: UtensilsCrossed },
+    { label: "Dashboard", href: base, icon: LayoutDashboard },
+    { label: "New Orders", href: `${base}/new-orders`, icon: Bell },
+    { label: "Orders", href: `${base}/orders`, icon: ClipboardList },
+    { label: "Manage Menu", href: `${base}/manage-menu`, icon: UtensilsCrossed },
   ];
 
+  // Brand Colors
+  const brandRed = "text-[#D92632]"; // The Red Text Color
+  const activeBg = "bg-[#FFEFEF]";   // The Pink Active Background
+  const activeText = "text-[#D92632]"; // The Red Active Text
+
   return (
-    <div
-      className="min-h-screen bg-[hsl(0,0%,92%)]"
-      style={{ fontFamily: "'Poppins', sans-serif" }}
-    >
+    <div className="min-h-screen bg-[#F5F5F5] font-[Poppins]">
       {/* Mobile overlay */}
       {sidebarOpen && (
         <div
-          className="fixed inset-0 bg-black/50 z-20 lg:hidden"
+          className="fixed inset-0 bg-black/50 z-40 lg:hidden"
           onClick={() => setSidebarOpen(false)}
         />
       )}
 
-      <div className="flex min-h-screen p-3 sm:p-4 gap-3 sm:gap-4">
+      <div className="flex h-screen overflow-hidden">
         {/* ─── Sidebar ─── */}
         <aside
-          className={[
-            "fixed top-0 left-0 h-full z-30 w-56",
-            "lg:static lg:z-auto lg:h-auto lg:w-52 xl:w-56",
-            "bg-white rounded-2xl shadow-sm flex flex-col flex-shrink-0",
-            "transition-transform duration-300 ease-in-out",
-            sidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0",
-          ].join(" ")}
+          className={`
+            fixed lg:static top-0 left-0 h-full z-50 w-64 bg-white shadow-lg lg:shadow-none flex flex-col transition-transform duration-300 ease-in-out
+            ${sidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"}
+          `}
         >
-          {/* Red logo area */}
-          <div className="bg-[hsl(355,72%,46%)] rounded-t-2xl px-5 py-[1.1rem] flex-shrink-0">
-            <div className="flex items-center justify-between">
-              <span className="text-white font-bold text-xl tracking-widest">SMARTDINI</span>
-              <button
-                className="lg:hidden text-white"
-                onClick={() => setSidebarOpen(false)}
-                aria-label="Close menu"
-              >
-                <X size={20} />
-              </button>
-            </div>
+          {/* Logo Area - White bg, Red Text */}
+          <div className="px-8 py-8 flex items-center justify-between">
+            <h1 className={`text-2xl font-extrabold tracking-wider ${brandRed}`}>
+              SMARTDINI
+            </h1>
+            <button
+              className="lg:hidden text-gray-500"
+              onClick={() => setSidebarOpen(false)}
+            >
+              <X size={24} />
+            </button>
           </div>
 
-          {/* Nav links */}
-          <nav className="flex-1 px-3 py-4 space-y-0.5">
+          {/* Navigation */}
+          <nav className="flex-1 px-4 space-y-2 overflow-y-auto">
             {navItems.map(({ label, href, icon: Icon }) => {
-              const isActive =
-                href === base
-                  ? pathname === base
-                  : pathname.startsWith(href);
+              const isActive = href === base ? pathname === base : pathname.startsWith(href);
+              
               return (
                 <Link
                   key={href}
                   href={href}
                   onClick={() => setSidebarOpen(false)}
-                  className={[
-                    "flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium transition-all duration-150",
-                    isActive
-                      ? "bg-[hsl(355,72%,92%)] text-[hsl(355,72%,46%)]"
-                      : "text-[hsl(0,0%,30%)] hover:bg-[hsl(0,0%,95%)]",
-                  ].join(" ")}
+                  className={`
+                    flex items-center gap-4 px-4 py-3 rounded-lg text-sm font-medium transition-all duration-200
+                    ${isActive 
+                      ? `${activeBg} ${activeText} shadow-sm` 
+                      : "text-gray-500 hover:bg-gray-50 hover:text-gray-900"}
+                  `}
                 >
-                  <Icon size={18} strokeWidth={isActive ? 2.2 : 1.8} />
+                  {/* Icon styling based on layout */}
+                  <Icon 
+                    size={20} 
+                    strokeWidth={isActive ? 2.5 : 2} 
+                    className={isActive ? "" : "opacity-70"}
+                  />
                   {label}
                 </Link>
               );
@@ -93,29 +96,32 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
           </nav>
         </aside>
 
-        {/* ─── Main content ─── */}
-        <div className="flex-1 flex flex-col min-w-0">
-          {/* Red top header */}
-          <header className="bg-[hsl(355,72%,46%)] rounded-2xl px-4 sm:px-6 py-[1.1rem] mb-3 sm:mb-4 flex items-center gap-3 flex-shrink-0">
+        {/* ─── Main Content Wrapper ─── */}
+        <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
+          
+          {/* Red Top Header */}
+          <header className="bg-[#D92632] px-6 py-4 flex items-center gap-4 shadow-md shrink-0 z-30">
             <button
-              className="lg:hidden text-white flex-shrink-0"
+              className="lg:hidden text-white"
               onClick={() => setSidebarOpen(true)}
-              aria-label="Open sidebar"
             >
-              <Menu size={22} />
+              <Menu size={24} />
             </button>
+
             <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0">
-                <User size={18} className="text-white" />
+              <div className="w-9 h-9 rounded-full bg-white flex items-center justify-center shadow-sm">
+                <User size={18} className="text-[#D92632]" strokeWidth={2.5} />
               </div>
-              <span className="text-white font-semibold text-base sm:text-lg">
+              <span className="text-white font-bold text-lg tracking-wide">
                 Admin Dashboard !
               </span>
             </div>
           </header>
 
-          {/* Page */}
-          <main className="flex-1">{children}</main>
+          {/* Scrollable Page Content */}
+          <main className="flex-1 overflow-y-auto p-4 md:p-6 lg:p-8">
+            {children}
+          </main>
         </div>
       </div>
     </div>

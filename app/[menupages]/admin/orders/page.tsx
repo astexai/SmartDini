@@ -1,8 +1,15 @@
+
 "use client";
 
-import { Package, Clock, ShoppingCart, CheckCircle, ChevronDown } from "lucide-react";
+import { Package, Clock, Armchair, CheckCircle, ChevronDown } from "lucide-react";
 
-type OrderItem = { id: number; name: string; price: number };
+// ─── Types ───
+type OrderItem = {
+  id: number; // The quantity badge number (1, 2, 4)
+  name: string;
+  price: number;
+};
+
 type Order = {
   id: string;
   number: number;
@@ -13,7 +20,8 @@ type Order = {
   items: OrderItem[];
 };
 
-const ORDERS: Order[] = [
+// ─── Data ───
+const PENDING_ORDERS: Order[] = [
   {
     id: "6", number: 6, time: "10:30 PM", table: "Table 001", total: 497, status: "pending",
     items: [
@@ -38,6 +46,9 @@ const ORDERS: Order[] = [
       { id: 4, name: "Chicken Burger", price: 199 },
     ],
   },
+];
+
+const COMPLETED_ORDERS: Order[] = [
   {
     id: "3", number: 3, time: "10:30 PM", table: "Table 001", total: 497, status: "completed",
     items: [
@@ -64,57 +75,73 @@ const ORDERS: Order[] = [
   },
 ];
 
+// ─── Component for Individual Card ───
 function OrderCard({ order }: { order: Order }) {
   const isPending = order.status === "pending";
 
   return (
-    <div className="bg-white rounded-2xl overflow-hidden shadow-sm mb-3 border border-[hsl(0,0%,93%)]">
+    <div className="bg-[#F3F4F6] rounded-2xl p-4 mb-4 shadow-sm">
       {/* Header */}
-      <div className="flex flex-wrap items-center justify-between gap-2 px-4 py-3 bg-[hsl(0,0%,95%)] rounded-t-2xl">
+      <div className="flex items-start justify-between mb-4">
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-xl bg-[hsl(355,60%,80%)] flex items-center justify-center flex-shrink-0">
-            <Package size={15} className="text-[hsl(355,72%,46%)]" />
+          {/* Icon Circle */}
+          <div className="w-10 h-10 rounded-full bg-[#FEE2E2] flex items-center justify-center flex-shrink-0">
+            <Package size={18} className="text-[#D92632]" strokeWidth={2} />
           </div>
+          
+          {/* Text Details */}
           <div>
-            <p className="font-semibold text-sm text-[hsl(0,0%,13%)]">
+            <h4 className="font-bold text-gray-900 text-sm sm:text-base">
               Order #{order.number}
-            </p>
-            <div className="flex items-center gap-1.5 text-[11px] text-[hsl(0,0%,55%)] mt-0.5">
-              <Clock size={9} />
+            </h4>
+            <div className="flex items-center gap-1.5 text-[11px] sm:text-xs text-gray-500 font-medium mt-0.5">
+              <Clock size={12} />
               <span>{order.time}</span>
-              <span>•</span>
-              <ShoppingCart size={9} />
+              <span className="text-gray-300">•</span>
+              <Armchair size={12} />
               <span>{order.table}</span>
             </div>
           </div>
         </div>
 
-        <div className="flex items-center gap-2 flex-shrink-0">
-          <span className="font-bold text-sm text-[hsl(0,0%,13%)]">₹{order.total}</span>
-          <button
-            className={[
-              "flex items-center gap-1 text-xs font-semibold px-3 py-1.5 rounded-lg border",
-              isPending
-                ? "bg-[hsl(40,100%,93%)] text-[hsl(35,90%,38%)] border-[hsl(40,80%,78%)]"
-                : "bg-[hsl(151,60%,91%)] text-[hsl(151,100%,28%)] border-[hsl(151,50%,70%)]",
-            ].join(" ")}
+        {/* Price & Status */}
+        <div className="flex flex-col sm:flex-row items-end sm:items-center gap-2">
+          <span className="font-extrabold text-gray-900 text-sm sm:text-base">
+            ₹{order.total}
+          </span>
+          <div
+            className={`
+              flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-bold
+              ${isPending 
+                ? "bg-[#FFEDD5] text-[#EA580C]" // Light Orange/Peach for Pending
+                : "bg-[#D1FAE5] text-[#059669]" // Light Green for Completed
+              }
+            `}
           >
-            {isPending ? <Clock size={10} /> : <CheckCircle size={10} />}
             {isPending ? "Pending" : "Completed"}
-            <ChevronDown size={10} />
-          </button>
+            <ChevronDown size={12} strokeWidth={3} />
+          </div>
         </div>
       </div>
 
-      {/* Items */}
-      <div className="divide-y divide-[hsl(0,1%,74%)]">
-        {order.items.map((item) => (
+      {/* Items List */}
+      <div className="space-y-2">
+        {order.items.map((item, idx) => (
           <div
-            key={`${order.id}-${item.id}`}
-            className="flex items-center justify-between px-4 py-2"
+            key={`${order.id}-${idx}`}
+            className="bg-white rounded-xl px-3 py-2.5 flex items-center justify-between shadow-sm"
           >
-            <span className="text-sm text-[hsl(0,0%,22%)]">{item.name}</span>
-            <span className="text-sm text-[hsl(0,0%,45%)]">₹{item.price}</span>
+            <div className="flex items-center gap-2">
+              <span className="w-5 h-5 rounded bg-[#FEE2E2] text-[#D92632] text-[10px] font-bold flex items-center justify-center">
+                {item.id}
+              </span>
+              <span className="text-xs sm:text-sm font-semibold text-gray-800">
+                {item.name}
+              </span>
+            </div>
+            <span className="text-xs sm:text-sm font-bold text-gray-600">
+              ₹{item.price}
+            </span>
           </div>
         ))}
       </div>
@@ -122,52 +149,59 @@ function OrderCard({ order }: { order: Order }) {
   );
 }
 
+// ─── Main Page Component ───
 export default function OrdersPage() {
-  const pending = ORDERS.filter((o) => o.status === "pending");
-  const completed = ORDERS.filter((o) => o.status === "completed");
-
   return (
-    <div className="bg-white rounded-2xl p-4 sm:p-6 shadow-sm">
-      {/* Title row */}
-      <div className="flex flex-wrap items-center justify-between gap-3 mb-5">
-        <h2 className="text-base sm:text-lg font-bold text-[hsl(0,0%,13%)]">
+    <div className="bg-white rounded-3xl p-6 shadow-sm border border-gray-100 min-h-[600px]">
+      
+      {/* ─── Top Header ─── */}
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-8">
+        <h2 className="text-xl font-extrabold text-gray-900">
           Orders Management
         </h2>
-        <div className="flex items-center gap-2">
-          <span className="flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-full bg-[hsl(151,60%,91%)] text-[hsl(151,100%,28%)] border border-[hsl(151,50%,70%)]">
-            <CheckCircle size={11} />
-            {completed.length} Completed
-          </span>
-          <span className="flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-full bg-[hsl(40,100%,93%)] text-[hsl(35,90%,38%)] border border-[hsl(40,80%,78%)]">
-            <Clock size={11} />
-            {pending.length} Pending
-          </span>
+        
+        {/* Summary Badges */}
+        <div className="flex items-center gap-3">
+          <div className="flex items-center gap-1.5 bg-[#D1FAE5] text-[#059669] px-4 py-2 rounded-lg text-sm font-bold">
+            <CheckCircle size={16} />
+            {COMPLETED_ORDERS.length} Completed
+          </div>
+          <div className="flex items-center gap-1.5 bg-[#FFEDD5] text-[#EA580C] px-4 py-2 rounded-lg text-sm font-bold">
+            <Clock size={16} />
+            {PENDING_ORDERS.length} Pending
+          </div>
         </div>
       </div>
 
-      {/* Two-column grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
-        {/* Pending column */}
+      {/* ─── Two Column Layout ─── */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        
+        {/* Column 1: Pending */}
         <div>
-          <div className="flex items-center gap-2 mb-3">
-            <Clock size={15} className="text-[hsl(355,72%,46%)]" />
-            <h3 className="font-bold text-sm text-[hsl(0,0%,13%)]">Pending Orders</h3>
+          <div className="flex items-center gap-2 mb-4">
+            <Clock size={18} className="text-[#EA580C]" />
+            <h3 className="font-bold text-base text-gray-900">Pending Orders</h3>
           </div>
-          {pending.map((order) => (
-            <OrderCard key={order.id} order={order} />
-          ))}
+          <div className="flex flex-col">
+            {PENDING_ORDERS.map((order) => (
+              <OrderCard key={order.id} order={order} />
+            ))}
+          </div>
         </div>
 
-        {/* Completed column */}
+        {/* Column 2: Completed */}
         <div>
-          <div className="flex items-center gap-2 mb-3">
-            <CheckCircle size={15} className="text-[hsl(151,100%,37%)]" />
-            <h3 className="font-bold text-sm text-[hsl(0,0%,13%)]">Completed Orders</h3>
+          <div className="flex items-center gap-2 mb-4">
+            <CheckCircle size={18} className="text-[#059669]" />
+            <h3 className="font-bold text-base text-gray-900">Completed Orders</h3>
           </div>
-          {completed.map((order) => (
-            <OrderCard key={order.id} order={order} />
-          ))}
+          <div className="flex flex-col">
+            {COMPLETED_ORDERS.map((order) => (
+              <OrderCard key={order.id} order={order} />
+            ))}
+          </div>
         </div>
+
       </div>
     </div>
   );

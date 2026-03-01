@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState } from "react";
@@ -13,10 +14,10 @@ import {
 } from "recharts";
 
 const weeklyData = [
-  { name: "Item 1", orders: 19 },
+  { name: "Item 1", orders: 18 },
   { name: "Item 2", orders: 25 },
-  { name: "Item 3", orders: 23 },
-  { name: "Item 4", orders: 36 },
+  { name: "Item 3", orders: 22 },
+  { name: "Item 4", orders: 34 },
   { name: "Item 5", orders: 36 },
 ];
 
@@ -25,16 +26,22 @@ const metrics = [
     label: "Total Orders",
     value: 50,
     icon: ClipboardList,
+    bgIcon: "bg-red-100", // Light pink circle
+    colorIcon: "text-red-600",
   },
   {
     label: "Pending Orders",
     value: 20,
     icon: Clock,
+    bgIcon: "bg-red-100",
+    colorIcon: "text-red-600",
   },
   {
     label: "Completed Orders",
     value: 30,
     icon: CheckCircle,
+    bgIcon: "bg-red-100",
+    colorIcon: "text-red-600",
   },
 ];
 
@@ -42,84 +49,96 @@ export default function DashboardPage() {
   const [period] = useState("Today");
 
   return (
-    <div className="bg-white rounded-2xl p-4 sm:p-6 shadow-sm h-full">
-      {/* Header */}
-      <div className="flex items-center justify-between mb-5">
-        <h2 className="text-base sm:text-lg font-bold text-[hsl(0,0%,13%)]">
+    <div className="bg-white rounded-3xl shadow-sm p-6 border border-gray-100 h-full">
+      
+      {/* ─── Dashboard Header ─── */}
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-8 gap-4">
+        <h2 className="text-xl font-bold text-gray-900">
           Dashboard Overview
         </h2>
-        <button className="flex items-center gap-1.5 bg-[hsl(355,72%,95%)] text-[hsl(355,72%,46%)] text-sm font-semibold px-4 py-1.5 rounded-full border border-[hsl(355,72%,78%)]">
+        
+        {/* Date Filter Button - Matches the Image style */}
+        <button className="flex items-center gap-2 bg-[#FFEFEF] text-[#D92632] px-5 py-2 rounded-lg text-sm font-bold border border-[#FECACA] hover:bg-[#FEE2E2] transition-colors">
           {period}
-          <ChevronDown size={14} />
+          <ChevronDown size={16} strokeWidth={3} />
         </button>
       </div>
 
-      {/* Metric cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-5">
-        {metrics.map(({ label, value, icon: Icon }) => (
+      {/* ─── Metrics Cards ─── */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        {metrics.map((item) => (
           <div
-            key={label}
-            className="bg-[hsl(0,0%,96%)] rounded-2xl p-4 flex items-center justify-between"
+            key={item.label}
+            className="bg-[#F3F4F6] rounded-2xl p-5 flex items-center justify-between"
           >
-            <div>
-              <p className="text-xs text-[hsl(0,0%,50%)] mb-1 leading-tight">{label}</p>
-              <p className="text-2xl sm:text-3xl font-bold text-[hsl(0,0%,10%)]">{value}</p>
+            <div className="flex flex-col gap-1">
+              <span className="text-sm font-medium text-gray-600">
+                {item.label}
+              </span>
+              <span className="text-3xl font-extrabold text-gray-900">
+                {item.value}
+              </span>
             </div>
-            <div className="w-11 h-11 rounded-full bg-[hsl(355,72%,93%)] flex items-center justify-center flex-shrink-0">
-              <Icon size={20} className="text-[hsl(355,72%,46%)]" />
+            
+            {/* Icon in Circle */}
+            <div className={`w-12 h-12 rounded-full ${item.bgIcon} flex items-center justify-center`}>
+              <item.icon className={item.colorIcon} size={22} strokeWidth={2.5} />
             </div>
           </div>
         ))}
       </div>
 
-      {/* Weekly chart */}
-      <div className="bg-[hsl(0,0%,96%)] rounded-2xl p-4 sm:p-5">
-        <h3 className="text-sm sm:text-base font-bold text-[hsl(0,0%,13%)] mb-4">
+      {/* ─── Weekly Orders Chart ─── */}
+      <div className="bg-[#F3F4F6] rounded-2xl p-6">
+        <h3 className="text-lg font-bold text-gray-900 mb-6">
           Weekly orders
         </h3>
-        <ResponsiveContainer width="100%" height={230}>
-          <LineChart
-            data={weeklyData}
-            margin={{ top: 8, right: 8, left: -24, bottom: 0 }}
-          >
-            <CartesianGrid
-              strokeDasharray="3 3"
-              stroke="hsl(0,0%,87%)"
-              vertical={false}
-            />
-            <XAxis
-              dataKey="name"
-              tick={{ fontSize: 11, fill: "hsl(0,0%,55%)" }}
-              axisLine={false}
-              tickLine={false}
-            />
-            <YAxis
-              domain={[0, 40]}
-              ticks={[0, 10, 20, 30, 40]}
-              tick={{ fontSize: 11, fill: "hsl(0,0%,55%)" }}
-              axisLine={false}
-              tickLine={false}
-            />
-            <Tooltip
-              contentStyle={{
-                borderRadius: "10px",
-                border: "none",
-                boxShadow: "0 4px 16px rgba(0,0,0,0.10)",
-                fontSize: "12px",
-                padding: "8px 12px",
-              }}
-              cursor={{ stroke: "hsl(355,72%,80%)", strokeWidth: 1 }}
-            />
-            <Line
-              type="monotone"
-              dataKey="orders"
-              stroke="hsl(355,72%,46%)"
-              strokeWidth={2.5}
-              dot={false}
-              activeDot={{ r: 5, fill: "hsl(355,72%,46%)", strokeWidth: 0 }}
-            />
-          </LineChart>
-        </ResponsiveContainer>
+        
+        <div className="w-full h-[250px]">
+          <ResponsiveContainer width="100%" height="100%">
+            <LineChart
+              data={weeklyData}
+              margin={{ top: 10, right: 10, left: -20, bottom: 0 }}
+            >
+              <CartesianGrid
+                vertical={false}
+                stroke="#E5E7EB" 
+                strokeDasharray="0" /* Solid lines matching simple designs */
+              />
+              <XAxis
+                dataKey="name"
+                axisLine={false}
+                tickLine={false}
+                tick={{ fill: "#6B7280", fontSize: 12, dy: 10 }}
+              />
+              <YAxis
+                axisLine={false}
+                tickLine={false}
+                tick={{ fill: "#6B7280", fontSize: 12 }}
+                ticks={[0, 10, 20, 30, 40]}
+                domain={[0, 40]}
+              />
+              <Tooltip
+                contentStyle={{
+                  backgroundColor: "#fff",
+                  borderRadius: "8px",
+                  border: "none",
+                  boxShadow: "0 4px 6px -1px rgb(0 0 0 / 0.1)",
+                }}
+                itemStyle={{ color: "#D92632", fontWeight: "bold" }}
+                cursor={{ stroke: "#D92632", strokeWidth: 1, strokeDasharray: "4 4" }}
+              />
+              <Line
+                type="monotone"
+                dataKey="orders"
+                stroke="#D92632"
+                strokeWidth={3}
+                dot={false}
+                activeDot={{ r: 6, fill: "#D92632", stroke: "#fff", strokeWidth: 2 }}
+              />
+            </LineChart>
+          </ResponsiveContainer>
+        </div>
       </div>
     </div>
   );
