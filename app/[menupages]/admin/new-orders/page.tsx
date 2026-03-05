@@ -95,19 +95,19 @@ export default function NewOrdersPage() {
   };
 
   return (
-    <div className="bg-white rounded-3xl p-6 shadow-sm border border-gray-100 min-h-[600px]">
+    <div className="bg-white rounded-3xl p-4 sm:p-6 shadow-sm border border-gray-100 min-h-[600px] w-full overflow-x-hidden">
       {/* ─── Page Title ─── */}
       <div className="flex items-center justify-between mb-6">
-        <h2 className="text-xl font-extrabold text-gray-900">
+        <h2 className="text-lg sm:text-xl font-extrabold text-gray-900">
           New Orders
         </h2>
-        <span className="text-sm bg-[#FEE2E2] text-[#D92632] px-3 py-1 rounded-full font-semibold">
+        <span className="text-xs sm:text-sm bg-[#FEE2E2] text-[#D92632] px-3 py-1 rounded-full font-semibold whitespace-nowrap">
           {orders.length} New
         </span>
       </div>
 
       {/* ─── Orders List ─── */}
-      <div className="flex flex-col gap-6">
+      <div className="flex flex-col gap-4 sm:gap-6">
         {orders.length === 0 && (
           <div className="flex flex-col items-center justify-center py-20 text-gray-400">
             <Package size={48} className="mb-4 opacity-20" />
@@ -125,37 +125,37 @@ export default function NewOrdersPage() {
               className="bg-[#F3F4F6] rounded-2xl p-4 sm:p-5 hover:shadow-md transition-shadow"
             >
               {/* ─── Order Header ─── */}
-              <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 mb-5">
+              <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3 sm:gap-4 mb-4 sm:mb-5">
                 
                 {/* Left: Icon & Meta */}
-                <div className="flex items-start sm:items-center gap-4">
+                <div className="flex items-start sm:items-center gap-3 sm:gap-4">
                   {/* Icon Circle */}
-                  <div className="w-12 h-12 rounded-full bg-[#FEE2E2] flex items-center justify-center flex-shrink-0">
-                    <Package size={22} className="text-[#D92632]" strokeWidth={2} />
+                  <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-[#FEE2E2] flex items-center justify-center flex-shrink-0">
+                    <Package size={18} className="text-[#D92632]" strokeWidth={2} />
                   </div>
                   
                   {/* Text Info */}
-                  <div>
-                    <div className="flex items-center flex-wrap gap-2">
-                      <h3 className="text-gray-900 font-bold text-base sm:text-lg">
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center flex-wrap gap-1.5 sm:gap-2">
+                      <h3 className="text-gray-900 font-bold text-sm sm:text-lg truncate">
                         New Order #{order.number}
                       </h3>
                       
                       {/* Payment Method Badge */}
-                      <div className={`flex items-center gap-1 px-2.5 py-1 rounded-full ${paymentBadge.bgColor} ${paymentBadge.textColor} text-xs font-bold`}>
-                        <PaymentIcon size={12} strokeWidth={2.5} />
+                      <div className={`flex items-center gap-1 px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-full ${paymentBadge.bgColor} ${paymentBadge.textColor} text-[10px] sm:text-xs font-bold whitespace-nowrap`}>
+                        <PaymentIcon size={10} strokeWidth={2.5} />
                         <span>{paymentBadge.label}</span>
                       </div>
                     </div>
                     
-                    <div className="flex items-center gap-2 text-xs sm:text-sm text-gray-500 font-medium mt-1">
+                    <div className="flex items-center gap-2 text-[10px] sm:text-sm text-gray-500 font-medium mt-0.5 sm:mt-1">
                       <div className="flex items-center gap-1">
-                        <Clock size={14} />
+                        <Clock size={12} />
                         <span>{order.time}</span>
                       </div>
                       <span className="text-gray-300">•</span>
                       <div className="flex items-center gap-1">
-                        <Armchair size={14} />
+                        <Armchair size={12} />
                         <span>{order.table}</span>
                       </div>
                     </div>
@@ -163,50 +163,50 @@ export default function NewOrdersPage() {
                 </div>
 
                 {/* Right: Actions */}
-                <div className="flex items-center justify-between lg:justify-end gap-4 w-full lg:w-auto mt-2 lg:mt-0 border-t lg:border-t-0 border-gray-200 pt-3 lg:pt-0">
-                  <span className="text-xl font-extrabold text-gray-900 mr-2">
+                <div className="flex items-center justify-between lg:justify-end gap-3 w-full lg:w-auto mt-2 lg:mt-0 border-t lg:border-t-0 border-gray-200 pt-3 lg:pt-0">
+                  <span className="text-lg sm:text-xl font-extrabold text-gray-900">
                     ₹{order.total}
                   </span>
                   
-                  <div className="flex items-center gap-2">
-                    {/* Accept Button */}
+                  <div className="flex items-center gap-1.5 sm:gap-2">
+                    {/* Accept Button - Smaller on Mobile */}
                     <button
                       onClick={() => remove(order.id)}
-                      className="flex items-center gap-1.5 bg-[#10B981] hover:bg-[#059669] text-white px-4 py-2 rounded-lg text-sm font-bold transition-colors shadow-sm"
+                      className="flex items-center gap-0.5 sm:gap-1.5 bg-[#10B981] hover:bg-[#059669] text-white px-2.5 py-1.5 sm:px-4 sm:py-2 rounded-lg text-[10px] sm:text-sm font-bold transition-colors shadow-sm"
                     >
-                      <Check size={16} strokeWidth={3} />
-                      Accept
+                      <Check size={12} strokeWidth={3} />
+                      <span className="sm:inline">Accept</span>
                     </button>
 
-                    {/* Reject Button */}
+                    {/* Reject Button - Smaller on Mobile */}
                     <button
                       onClick={() => remove(order.id)}
-                      className="flex items-center gap-1.5 bg-white border border-[#EF4444] text-[#EF4444] hover:bg-[#FEF2F2] px-4 py-2 rounded-lg text-sm font-bold transition-colors shadow-sm"
+                      className="flex items-center gap-0.5 sm:gap-1.5 bg-white border border-[#EF4444] text-[#EF4444] hover:bg-[#FEF2F2] px-2.5 py-1.5 sm:px-4 sm:py-2 rounded-lg text-[10px] sm:text-sm font-bold transition-colors shadow-sm"
                     >
-                      <X size={16} strokeWidth={3} />
-                      Reject
+                      <X size={12} strokeWidth={3} />
+                      <span className="sm:inline">Reject</span>
                     </button>
                   </div>
                 </div>
               </div>
 
               {/* ─── Order Items (White Cards) ─── */}
-              <div className="space-y-2">
+              <div className="space-y-1.5 sm:space-y-2">
                 {order.items.map((item, index) => (
                   <div
                     key={`${order.id}-${item.id}-${index}`}
-                    className="bg-white rounded-xl px-4 py-3 flex items-center justify-between shadow-sm hover:shadow transition-shadow"
+                    className="bg-white rounded-xl px-3 sm:px-4 py-2 sm:py-3 flex items-center justify-between shadow-sm hover:shadow transition-shadow"
                   >
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
                       {/* Pink Badge Number */}
-                      <span className="w-6 h-6 rounded bg-[#FEE2E2] text-[#D92632] text-xs font-bold flex items-center justify-center">
+                      <span className="w-5 h-5 sm:w-6 sm:h-6 rounded bg-[#FEE2E2] text-[#D92632] text-[10px] sm:text-xs font-bold flex items-center justify-center flex-shrink-0">
                         {item.id}
                       </span>
-                      <span className="text-sm font-semibold text-gray-800">
+                      <span className="text-xs sm:text-sm font-semibold text-gray-800 truncate">
                         {item.name}
                       </span>
                     </div>
-                    <span className="text-sm font-bold text-gray-600">
+                    <span className="text-xs sm:text-sm font-bold text-gray-600 whitespace-nowrap ml-2">
                       ₹{item.price}
                     </span>
                   </div>
