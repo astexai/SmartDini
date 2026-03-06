@@ -1,4 +1,3 @@
-
 "use client";
 
 import Link from "next/link";
@@ -13,6 +12,8 @@ import {
   X,
   User,
   CheckCircle,
+  Settings,
+  LogOut,
 } from "lucide-react";
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
@@ -30,12 +31,20 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     { label: "Orders", href: `${base}/orders`, icon: ClipboardList },
     { label: "Payment Completed", href: `${base}/payment-completed`, icon: CheckCircle },
     { label: "Manage Menu", href: `${base}/manage-menu`, icon: UtensilsCrossed },
+    { label: "Settings", href: `${base}/settings`, icon: Settings }, 
   ];
 
   // Brand Colors
   const brandRed = "text-[#D92632]"; // The Red Text Color
   const activeBg = "bg-[#FFEFEF]";   // The Pink Active Background
   const activeText = "text-[#D92632]"; // The Red Active Text
+
+  // Logout handler
+  const handleLogout = () => {
+    // Add your logout logic here
+    console.log("Logout clicked");
+    // Example: router.push('/login');
+  };
 
   return (
     <div className="min-h-screen bg-[#F5F5F5] font-[Poppins]">
@@ -96,6 +105,21 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               );
             })}
           </nav>
+
+          {/* Logout Button - Fixed at bottom */}
+          <div className="p-4 border-t border-gray-100 mt-auto">
+            <button
+              onClick={handleLogout}
+              className="w-full flex items-center gap-4 px-4 py-3 rounded-lg text-sm font-medium text-gray-500 hover:bg-red-50 hover:text-[#D92632] transition-all duration-200 group"
+            >
+              <LogOut 
+                size={20} 
+                strokeWidth={2} 
+                className="opacity-70 group-hover:opacity-100 group-hover:text-[#D92632] transition-colors"
+              />
+              <span>Logout</span>
+            </button>
+          </div>
         </aside>
 
         {/* ─── Main Content Wrapper ─── */}

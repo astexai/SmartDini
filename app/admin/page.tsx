@@ -1,272 +1,3 @@
-// "use client";
-
-// import { useEffect, useMemo, useState } from "react";
-// import { Button } from "@/components/ui/button";
-
-// type Plan = "Demo (7 Days)" | "1 Month" | "6 Months" | "12 Months";
-
-// const plans: { label: Plan; days: number }[] = [
-//   { label: "Demo (7 Days)", days: 7 },
-//   { label: "1 Month", days: 30 },
-//   { label: "6 Months", days: 182 },
-//   { label: "12 Months", days: 365 },
-// ];
-
-// function fmt(d: Date) {
-//   const dd = String(d.getDate()).padStart(2, "0");
-//   const mm = String(d.getMonth() + 1).padStart(2, "0");
-//   const yyyy = d.getFullYear();
-//   return `${dd}-${mm}-${yyyy}`;
-// }
-
-// export default function SuperAdminHome() {
-//   const today = useMemo(() => new Date(), []);
-//   const [activeTab, setActiveTab] = useState<"add" | "manage">("add");
-
-//   const [cafeName, setCafeName] = useState("");
-//   const [ownerName, setOwnerName] = useState("");
-//   const [city, setCity] = useState("");
-//   const [location, setLocation] = useState("");
-//   const [plan, setPlan] = useState<Plan>("Demo (7 Days)");
-//   const [start, setStart] = useState(fmt(today));
-//   const [end, setEnd] = useState("");
-//   const [slug, setSlug] = useState("");
-//   const [username, setUsername] = useState("");
-//   const [password, setPassword] = useState("");
-
-//   useEffect(() => {
-//     const p = plans.find((p) => p.label === plan)!;
-//     const [dd, mm, yyyy] = start.split("-").map((v) => parseInt(v, 10));
-//     const s = new Date(yyyy, mm - 1, dd);
-//     const e = new Date(s);
-//     e.setDate(e.getDate() + p.days);
-//     setEnd(fmt(e));
-//   }, [plan, start]);
-
-//   useEffect(() => {
-//     const s =
-//       cafeName
-//         .toLowerCase()
-//         .replace(/[^a-z0-9\s-]/g, "")
-//         .trim()
-//         .replace(/\s+/g, "") || "";
-//     setSlug(s);
-//   }, [cafeName]);
-
-//   const handleCreate = () => {
-//     // UI only
-//     alert(
-//       `Profile created for ${cafeName}\nSlug: ${slug}\nAdmin: ${username}\nPlan: ${plan}\nStart: ${start}\nEnd: ${end}`
-//     );
-//   };
-
-//   return (
-//     <div className="min-h-svh bg-background">
-//       <div className="max-w-7xl mx-auto px-4 py-6">
-//         {/* Top bar */}
-//         <div className="bg-card rounded-2xl border p-4 flex items-center justify-between">
-//           <div className="text-2xl font-bold">
-//             <span className="text-primary">Smart</span>dini
-//           </div>
-//           <div className="flex items-center gap-3">
-//             <div className="text-sm text-muted-foreground">Super Admin</div>
-//             <div className="w-9 h-9 rounded-full bg-primary text-white grid place-items-center font-semibold">
-//               SA
-//             </div>
-//           </div>
-//         </div>
-
-//         {/* Tabs */}
-//         <div className="flex items-center justify-center my-6">
-//           <div className="bg-card rounded-full border p-1 shadow-sm flex">
-//             <button
-//               className={`px-6 py-2 rounded-full font-semibold ${
-//                 activeTab === "add"
-//                   ? "bg-primary text-white shadow"
-//                   : "text-foreground"
-//               }`}
-//               onClick={() => setActiveTab("add")}
-//             >
-//               Add Cafes
-//             </button>
-//             <button
-//               className={`px-6 py-2 rounded-full font-semibold ${
-//                 activeTab === "manage"
-//                   ? "bg-primary text-white shadow"
-//                   : "text-foreground"
-//               }`}
-//               onClick={() => setActiveTab("manage")}
-//             >
-//               Manage Cafes
-//             </button>
-//           </div>
-//         </div>
-
-//         {/* Add Cafes */}
-//         {activeTab === "add" && (
-//           <div className="bg-card rounded-2xl border p-6 shadow-sm">
-//             <div className="grid lg:grid-cols-3 gap-4">
-//               <div>
-//                 <div className="text-sm mb-1">Cafe Name</div>
-//                 <input
-//                   className="w-full px-3 py-2 rounded-lg border"
-//                   placeholder="e.g. Beans & Brews"
-//                   value={cafeName}
-//                   onChange={(e) => setCafeName(e.target.value)}
-//                 />
-//               </div>
-//               <div>
-//                 <div className="text-sm mb-1">Owner Name</div>
-//                 <input
-//                   className="w-full px-3 py-2 rounded-lg border"
-//                   placeholder="e.g. Full Name"
-//                   value={ownerName}
-//                   onChange={(e) => setOwnerName(e.target.value)}
-//                 />
-//               </div>
-//               <div>
-//                 <div className="text-sm mb-1">City</div>
-//                 <input
-//                   className="w-full px-3 py-2 rounded-lg border"
-//                   placeholder="e.g. New York"
-//                   value={city}
-//                   onChange={(e) => setCity(e.target.value)}
-//                 />
-//               </div>
-//               <div className="lg:col-span-3">
-//                 <div className="text-sm mb-1">Location (Full Address)</div>
-//                 <input
-//                   className="w-full px-3 py-2 rounded-lg border"
-//                   placeholder="123 Street Name..."
-//                   value={location}
-//                   onChange={(e) => setLocation(e.target.value)}
-//                 />
-//               </div>
-//               <div>
-//                 <div className="text-sm mb-1">Subscription Plan</div>
-//                 <select
-//                   className="w-full px-3 py-2 rounded-lg border"
-//                   value={plan}
-//                   onChange={(e) => setPlan(e.target.value as Plan)}
-//                 >
-//                   {plans.map((p) => (
-//                     <option key={p.label} value={p.label}>
-//                       {p.label}
-//                     </option>
-//                   ))}
-//                 </select>
-//               </div>
-//               <div>
-//                 <div className="text-sm mb-1">Start Date</div>
-//                 <input
-//                   className="w-full px-3 py-2 rounded-lg border"
-//                   value={start}
-//                   onChange={(e) => setStart(e.target.value)}
-//                 />
-//               </div>
-//               <div>
-//                 <div className="text-sm mb-1">End Date</div>
-//                 <input
-//                   className="w-full px-3 py-2 rounded-lg border"
-//                   value={end}
-//                   readOnly
-//                 />
-//               </div>
-//               <div>
-//                 <div className="text-sm mb-1">Generated Slug (URL ID)</div>
-//                 <input
-//                   className="w-full px-3 py-2 rounded-lg border"
-//                   value={slug}
-//                   readOnly
-//                 />
-//               </div>
-//               <div>
-//                 <div className="text-sm mb-1">Cafe Username</div>
-//                 <input
-//                   className="w-full px-3 py-2 rounded-lg border"
-//                   placeholder="Login Username"
-//                   value={username}
-//                   onChange={(e) => setUsername(e.target.value)}
-//                 />
-//               </div>
-//               <div>
-//                 <div className="text-sm mb-1">Cafe Password</div>
-//                 <input
-//                   className="w-full px-3 py-2 rounded-lg border"
-//                   placeholder="Login Password"
-//                   type="password"
-//                   value={password}
-//                   onChange={(e) => setPassword(e.target.value)}
-//                 />
-//               </div>
-//             </div>
-//             <div className="pt-6">
-//               <Button className="w-full h-12 text-base" onClick={handleCreate}>
-//                 Create New Profile
-//               </Button>
-//             </div>
-//           </div>
-//         )}
-
-//         {/* Manage Cafes */}
-//         {activeTab === "manage" && (
-//           <div className="bg-card rounded-2xl border p-6 shadow-sm">
-//             <div className="overflow-auto">
-//               <table className="w-full text-sm">
-//                 <thead className="bg-muted/30">
-//                   <tr>
-//                     <th className="text-left px-3 py-2 font-medium">Cafe Name</th>
-//                     <th className="text-left px-3 py-2 font-medium">Start Date</th>
-//                     <th className="text-left px-3 py-2 font-medium">End Date</th>
-//                     <th className="text-left px-3 py-2 font-medium">Status</th>
-//                     <th className="text-left px-3 py-2 font-medium">Actions</th>
-//                   </tr>
-//                 </thead>
-//                 <tbody>
-//                   {[
-//                     { name: "Chai Adda", start: "01-02-2026", end: "01-03-2026", active: true, slug: "chaiadda105" },
-//                     { name: "Beans & Brews", start: "10-01-2026", end: "10-07-2026", active: false, slug: "beansbrews" },
-//                   ].map((r, i) => (
-//                     <tr key={i} className="border-t">
-//                       <td className="px-3 py-2">{r.name}</td>
-//                       <td className="px-3 py-2">{r.start}</td>
-//                       <td className="px-3 py-2">{r.end}</td>
-//                       <td className="px-3 py-2">
-//                         <span
-//                           className={`px-2 py-1 rounded-md text-xs ${
-//                             r.active ? "bg-emerald-100 text-emerald-700" : "bg-rose-100 text-rose-700"
-//                           }`}
-//                         >
-//                           {r.active ? "Active" : "Closed"}
-//                         </span>
-//                       </td>
-//                       <td className="px-3 py-2 space-x-2">
-//                         <a
-//                           href={`/${r.slug}/menu`}
-//                           className="px-3 py-1 rounded-lg bg-primary text-white"
-//                         >
-//                           Open
-//                         </a>
-//                         <button className="px-3 py-1 rounded-lg bg-gray-200">Close</button>
-//                       </td>
-//                     </tr>
-//                   ))}
-//                 </tbody>
-//               </table>
-//             </div>
-//           </div>
-//         )}
-//       </div>
-//     </div>
-//   );
-// }
-
-
-
-
-
-
-
 // superadmin.tsx
 "use client";
 import { useState, useEffect, useRef } from 'react';
@@ -287,6 +18,13 @@ export default function SuperAdmin() {
   const [editName, setEditName] = useState('');
   const [editOwner, setEditOwner] = useState('');
   const [editCity, setEditCity] = useState('');
+  // New state variables for added fields
+  const [editEmail, setEditEmail] = useState('');
+  const [editLocation, setEditLocation] = useState('');
+  const [editPlan, setEditPlan] = useState('1');
+  const [editEndDate, setEditEndDate] = useState('');
+  // New state for edit start date
+  const [editStartDate, setEditStartDate] = useState('');
 
   // Refs for modal close on outside click
   const modalRef = useRef<HTMLDivElement>(null);
@@ -311,6 +49,24 @@ export default function SuperAdmin() {
 
     setEndDate(date.toISOString().split('T')[0]);
   }, [startDate, plan]);
+
+  // Calculate edit end date when edit start date or edit plan changes
+  useEffect(() => {
+    if (!editStartDate) return;
+
+    const date = new Date(editStartDate);
+    
+    if (editPlan === 'demo') {
+      date.setDate(date.getDate() + 7);
+    } else if (editPlan === 'lifetime') {
+      // For lifetime, set a far future date or keep as is
+      date.setFullYear(date.getFullYear() + 100);
+    } else {
+      date.setMonth(date.getMonth() + parseInt(editPlan));
+    }
+
+    setEditEndDate(date.toISOString().split('T')[0]);
+  }, [editStartDate, editPlan]);
 
   // Generate slug from cafe name
   const generateSlug = (name: string) => {
@@ -347,11 +103,16 @@ export default function SuperAdmin() {
     }, 100);
   };
 
-  // Modal functions
-  const openEditModal = (name: string, owner: string, city: string) => {
+  // Modal functions - Updated to include all fields including start date
+  const openEditModal = (name: string, owner: string, city: string, email: string = '', location: string = '', currentPlan: string = '1', endDate: string = '', startDate: string = '') => {
     setEditName(name);
     setEditOwner(owner);
     setEditCity(city);
+    setEditEmail(email);
+    setEditLocation(location);
+    setEditPlan(currentPlan);
+    setEditEndDate(endDate);
+    setEditStartDate(startDate || new Date().toISOString().split('T')[0]); // Set default if not provided
     setShowModal(true);
   };
 
@@ -439,6 +200,11 @@ export default function SuperAdmin() {
               <div className="form-group">
                 <label>Owner Name</label>
                 <input type="text" className="form-control" placeholder="Full Name" required />
+              </div>
+              {/* Added Email ID Field */}
+              <div className="form-group">
+                <label>Email ID</label>
+                <input type="email" className="form-control" placeholder="owner@example.com" required />
               </div>
               <div className="form-group">
                 <label>City</label>
@@ -561,90 +327,212 @@ export default function SuperAdmin() {
           </select>
         </div>
 
-        {/* Table */}
-        <div className="table-responsive">
-          <table>
-            <thead>
-              <tr>
-                <th>Cafe Name</th>
-                <th>Owner</th>
-                <th>City</th>
-                <th>Plan</th>
-                <th>End Date</th>
-                <th>Username</th>
-                <th>Status</th>
-                <th>Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              {/* Row 1 */}
-              <tr>
-                <td>Central Perk</td>
-                <td>Gunther</td>
-                <td>New York</td>
-                <td>12 Months</td>
-                <td>2024-12-31</td>
-                <td>central_p</td>
-                <td>
-                  <label className="switch">
-                    <input type="checkbox" defaultChecked />
-                    <span className="slider"></span>
-                  </label>
-                </td>
-                <td>
-                  <button className="btn-edit" onClick={() => openEditModal('Central Perk', 'Gunther', 'New York')}>
-                    <svg viewBox="0 0 24 24" aria-hidden="true" className="icon-pencil">
-                      <path d="M3 17.25V21h3.75L21 6.75 17.25 3 3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41L18.37 3.29a.9959.9959 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z" />
-                    </svg>
-                  </button>
-                </td>
-              </tr>
-              {/* Row 2 */}
-              <tr>
-                <td>Luke's Diner</td>
-                <td>Luke Danes</td>
-                <td>Stars Hollow</td>
-                <td>6 Months</td>
-                <td>2024-06-30</td>
-                <td>lukes_diner</td>
-                <td>
-                  <label className="switch">
-                    <input type="checkbox" defaultChecked />
-                    <span className="slider"></span>
-                  </label>
-                </td>
-                <td>
-                  <button className="btn-edit" onClick={() => openEditModal("Luke's Diner", 'Luke Danes', 'Stars Hollow')}>
-                    <svg viewBox="0 0 24 24" aria-hidden="true" className="icon-pencil">
-                      <path d="M3 17.25V21h3.75L21 6.75 17.25 3 3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41L18.37 3.29a.9959.9959 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z" />
-                    </svg>
-                  </button>
-                </td>
-              </tr>
-              {/* Row 3 */}
-              <tr>
-                <td>The Rose</td>
-                <td>Moiraine</td>
-                <td>Tar Valon</td>
-                <td>Demo</td>
-                <td>2023-10-10</td>
-                <td>rose_cafe</td>
-                <td>
-                  <label className="switch">
-                    <input type="checkbox" />
-                    <span className="slider"></span>
-                  </label>
-                </td>
-                <td>
-                  <button className="btn-edit" onClick={() => openEditModal('The Rose', 'Moiraine', 'Tar Valon')}>
-                    <svg viewBox="0 0 24 24" aria-hidden="true" className="icon-pencil">
-                      <path d="M3 17.25V21h3.75L21 6.75 17.25 3 3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41L18.37 3.29a.9959.9959 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z" />
-                    </svg>
-                  </button>
-                </td>
-              </tr>
-            </tbody>
-          </table>
+        {/* Table - REDESIGNED FOR PROPER ALIGNMENT AND SCROLLING */}
+        <div className="table-wrapper">
+          <div className="table-scroll">
+            <table>
+              <thead>
+                <tr>
+                  <th>Cafe Name</th>
+                  <th>Owner</th>
+                  <th>Email</th>
+                  <th>City</th>
+                  <th>Location</th>
+                  <th>Plan</th>
+                  <th>End Date</th>
+                  <th>Username</th>
+                  <th>Status</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {/* Row 1 */}
+                <tr>
+                  <td><div className="cell-content">Central Perk</div></td>
+                  <td><div className="cell-content">Gunther</div></td>
+                  <td><div className="cell-content">gunther@centralperk.com</div></td>
+                  <td><div className="cell-content">New York</div></td>
+                  <td><div className="cell-content">199 Bedford Ave, Brooklyn</div></td>
+                  <td><div className="cell-content">12 Months</div></td>
+                  <td><div className="cell-content">2024-12-31</div></td>
+                  <td><div className="cell-content">central_p</div></td>
+                  <td>
+                    <div className="status-wrapper">
+                      <label className="switch">
+                        <input type="checkbox" defaultChecked />
+                        <span className="slider"></span>
+                      </label>
+                    </div>
+                  </td>
+                  <td>
+                    <div className="action-wrapper">
+                      <button className="btn-edit" onClick={() => openEditModal(
+                        'Central Perk', 
+                        'Gunther', 
+                        'New York',
+                        'gunther@centralperk.com',
+                        '199 Bedford Ave, Brooklyn',
+                        '12',
+                        '2024-12-31',
+                        '2024-01-01' // Start date
+                      )}>
+                        <svg viewBox="0 0 24 24" aria-hidden="true" className="icon-pencil">
+                          <path d="M3 17.25V21h3.75L21 6.75 17.25 3 3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41L18.37 3.29a.9959.9959 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z" />
+                        </svg>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+                {/* Row 2 */}
+                <tr>
+                  <td><div className="cell-content">Luke's Diner</div></td>
+                  <td><div className="cell-content">Luke Danes</div></td>
+                  <td><div className="cell-content">luke@lukesdiner.com</div></td>
+                  <td><div className="cell-content">Stars Hollow</div></td>
+                  <td><div className="cell-content">45 Main Street, Stars Hollow</div></td>
+                  <td><div className="cell-content">6 Months</div></td>
+                  <td><div className="cell-content">2024-06-30</div></td>
+                  <td><div className="cell-content">lukes_diner</div></td>
+                  <td>
+                    <div className="status-wrapper">
+                      <label className="switch">
+                        <input type="checkbox" defaultChecked />
+                        <span className="slider"></span>
+                      </label>
+                    </div>
+                  </td>
+                  <td>
+                    <div className="action-wrapper">
+                      <button className="btn-edit" onClick={() => openEditModal(
+                        "Luke's Diner", 
+                        'Luke Danes', 
+                        'Stars Hollow',
+                        'luke@lukesdiner.com',
+                        '45 Main Street, Stars Hollow',
+                        '6',
+                        '2024-06-30',
+                        '2024-01-01' // Start date
+                      )}>
+                        <svg viewBox="0 0 24 24" aria-hidden="true" className="icon-pencil">
+                          <path d="M3 17.25V21h3.75L21 6.75 17.25 3 3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41L18.37 3.29a.9959.9959 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z" />
+                        </svg>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+                {/* Row 3 */}
+                <tr>
+                  <td><div className="cell-content">The Rose</div></td>
+                  <td><div className="cell-content">Moiraine</div></td>
+                  <td><div className="cell-content">moiraine@therose.com</div></td>
+                  <td><div className="cell-content">Tar Valon</div></td>
+                  <td><div className="cell-content">12 White Tower, Tar Valon</div></td>
+                  <td><div className="cell-content">Demo</div></td>
+                  <td><div className="cell-content">2023-10-10</div></td>
+                  <td><div className="cell-content">rose_cafe</div></td>
+                  <td>
+                    <div className="status-wrapper">
+                      <label className="switch">
+                        <input type="checkbox" />
+                        <span className="slider"></span>
+                      </label>
+                    </div>
+                  </td>
+                  <td>
+                    <div className="action-wrapper">
+                      <button className="btn-edit" onClick={() => openEditModal(
+                        'The Rose', 
+                        'Moiraine', 
+                        'Tar Valon',
+                        'moiraine@therose.com',
+                        '12 White Tower, Tar Valon',
+                        '0',
+                        '2023-10-10',
+                        '2023-10-03' // Start date
+                      )}>
+                        <svg viewBox="0 0 24 24" aria-hidden="true" className="icon-pencil">
+                          <path d="M3 17.25V21h3.75L21 6.75 17.25 3 3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41L18.37 3.29a.9959.9959 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z" />
+                        </svg>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+                {/* Additional rows for testing scroll */}
+                <tr>
+                  <td><div className="cell-content">Coffee House</div></td>
+                  <td><div className="cell-content">John Smith</div></td>
+                  <td><div className="cell-content">john@coffeehouse.com</div></td>
+                  <td><div className="cell-content">Chicago</div></td>
+                  <td><div className="cell-content">123 Main St, Chicago, IL</div></td>
+                  <td><div className="cell-content">1 Month</div></td>
+                  <td><div className="cell-content">2024-04-15</div></td>
+                  <td><div className="cell-content">coffee_house</div></td>
+                  <td>
+                    <div className="status-wrapper">
+                      <label className="switch">
+                        <input type="checkbox" defaultChecked />
+                        <span className="slider"></span>
+                      </label>
+                    </div>
+                  </td>
+                  <td>
+                    <div className="action-wrapper">
+                      <button className="btn-edit" onClick={() => openEditModal(
+                        'Coffee House', 
+                        'John Smith', 
+                        'Chicago',
+                        'john@coffeehouse.com',
+                        '123 Main St, Chicago, IL',
+                        '1',
+                        '2024-04-15',
+                        '2024-03-15' // Start date
+                      )}>
+                        <svg viewBox="0 0 24 24" aria-hidden="true" className="icon-pencil">
+                          <path d="M3 17.25V21h3.75L21 6.75 17.25 3 3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41L18.37 3.29a.9959.9959 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z" />
+                        </svg>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td><div className="cell-content">Tea Time</div></td>
+                  <td><div className="cell-content">Emma Watson</div></td>
+                  <td><div className="cell-content">emma@teatime.com</div></td>
+                  <td><div className="cell-content">Boston</div></td>
+                  <td><div className="cell-content">456 Park Ave, Boston, MA</div></td>
+                  <td><div className="cell-content">3 Months</div></td>
+                  <td><div className="cell-content">2024-06-20</div></td>
+                  <td><div className="cell-content">tea_time</div></td>
+                  <td>
+                    <div className="status-wrapper">
+                      <label className="switch">
+                        <input type="checkbox" defaultChecked />
+                        <span className="slider"></span>
+                      </label>
+                    </div>
+                  </td>
+                  <td>
+                    <div className="action-wrapper">
+                      <button className="btn-edit" onClick={() => openEditModal(
+                        'Tea Time', 
+                        'Emma Watson', 
+                        'Boston',
+                        'emma@teatime.com',
+                        '456 Park Ave, Boston, MA',
+                        '3',
+                        '2024-06-20',
+                        '2024-03-20' // Start date
+                      )}>
+                        <svg viewBox="0 0 24 24" aria-hidden="true" className="icon-pencil">
+                          <path d="M3 17.25V21h3.75L21 6.75 17.25 3 3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41L18.37 3.29a.9959.9959 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z" />
+                        </svg>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
 
@@ -653,52 +541,115 @@ export default function SuperAdmin() {
         <div id="editModal" className="modal-overlay" style={{ display: 'flex' }}>
           <div className="modal" ref={modalRef}>
             <div className="modal-header">
-              <h3>Edit Cafe Details</h3>
-              <i className="fas fa-times" style={{ cursor: 'pointer' }} onClick={closeEditModal}></i>
+              <h3>Extend Plan</h3>
+              <button className="modal-close" onClick={closeEditModal}>×</button>
             </div>
-            <div className="form-grid">
-              <div className="form-group">
-                <label>Cafe Name</label>
-                <input 
-                  type="text" 
-                  id="editName" 
-                  className="form-control" 
-                  value={editName}
-                  onChange={(e) => setEditName(e.target.value)}
-                />
-              </div>
-              <div className="form-group">
-                <label>Owner Name</label>
-                <input 
-                  type="text" 
-                  id="editOwner" 
-                  className="form-control" 
-                  value={editOwner}
-                  onChange={(e) => setEditOwner(e.target.value)}
-                />
-              </div>
-              <div className="form-group">
-                <label>City</label>
-                <input 
-                  type="text" 
-                  id="editCity" 
-                  className="form-control" 
-                  value={editCity}
-                  onChange={(e) => setEditCity(e.target.value)}
-                />
-              </div>
-              <div className="form-group">
-                <label>Change Plan</label>
-                <select className="form-control">
-                  <option>Current Plan</option>
-                  <option>Extend 1 Month</option>
-                  <option>Extend 1 Year</option>
-                </select>
+            <div className="modal-body">
+              <div className="modal-form-grid">
+                {/* Row 1: Cafe Name and Owner Name */}
+                <div className="form-row">
+                  <div className="form-group">
+                    <label>Cafe Name</label>
+                    <input 
+                      type="text" 
+                      className="form-control" 
+                      value={editName}
+                      onChange={(e) => setEditName(e.target.value)}
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label>Owner Name</label>
+                    <input 
+                      type="text" 
+                      className="form-control" 
+                      value={editOwner}
+                      onChange={(e) => setEditOwner(e.target.value)}
+                    />
+                  </div>
+                </div>
+                
+                {/* Row 2: Email and City */}
+                <div className="form-row">
+                  <div className="form-group">
+                    <label>Email ID</label>
+                    <input 
+                      type="email" 
+                      className="form-control" 
+                      value={editEmail}
+                      onChange={(e) => setEditEmail(e.target.value)}
+                    />
+                  </div>
+                  <div className="form-group">
+                    <label>City</label>
+                    <input 
+                      type="text" 
+                      className="form-control" 
+                      value={editCity}
+                      onChange={(e) => setEditCity(e.target.value)}
+                    />
+                  </div>
+                </div>
+                
+                {/* Row 3: Location (full width) */}
+                <div className="form-row full-width">
+                  <div className="form-group full-width">
+                    <label>Location</label>
+                    <input 
+                      type="text" 
+                      className="form-control" 
+                      value={editLocation}
+                      onChange={(e) => setEditLocation(e.target.value)}
+                      placeholder="Full address"
+                    />
+                  </div>
+                </div>
+                
+                {/* Row 4: Plan and Start Date */}
+                <div className="form-row">
+                  <div className="form-group">
+                    <label>Extend Plan</label>
+                    <select 
+                      className="form-control"
+                      value={editPlan}
+                      onChange={(e) => setEditPlan(e.target.value)}
+                    >
+                      <option value="demo">Demo (7 Days)</option>
+                      <option value="1">1 Month</option>
+                      <option value="3">3 Months</option>
+                      <option value="6">6 Months</option>
+                      <option value="12">1 Year</option>
+                      <option value="lifetime">Lifetime</option>
+                    </select>
+                  </div>
+                  <div className="form-group">
+                    <label>Start Date</label>
+                    <input 
+                      type="date" 
+                      className="form-control" 
+                      value={editStartDate}
+                      onChange={(e) => setEditStartDate(e.target.value)}
+                    />
+                  </div>
+                </div>
+
+                {/* Row 5: End Date (auto-calculated) */}
+                <div className="form-row full-width">
+                  <div className="form-group full-width">
+                    <label>New End Date (Auto-calculated)</label>
+                    <input 
+                      type="date" 
+                      className="form-control" 
+                      value={editEndDate}
+                      readOnly
+                      style={{ backgroundColor: '#f0f0f0', cursor: 'not-allowed' }}
+                    />
+                  </div>
+                </div>
               </div>
             </div>
             <div className="modal-footer">
               <button className="btn-cancel" onClick={closeEditModal}>Cancel</button>
-              <button className="btn-primary" style={{ width: 'auto', marginTop: 0 }} onClick={saveChanges}>Save Changes</button>
+              <button className="btn-primary" onClick={saveChanges}>Extend Plan</button>
             </div>
           </div>
         </div>
@@ -871,46 +822,344 @@ export default function SuperAdmin() {
         }
         .filter-select { padding: 10px; border-radius: 8px; border: 1px solid var(--border); min-width: 150px; }
 
-        /* --- TABLE --- */
-        .table-responsive { overflow-x: auto; background: var(--white); border-radius: 12px; box-shadow: var(--shadow); }
-        table { width: 100%; border-collapse: collapse; min-width: 1000px; }
-        thead { background: #f8f9fa; border-bottom: 2px solid var(--border); }
-        th { padding: 15px; text-align: left; font-weight: 600; color: var(--dark); font-size: 0.85rem; text-transform: uppercase; }
-        td { padding: 15px; border-bottom: 1px solid var(--border); font-size: 0.9rem; color: #444; vertical-align: middle; }
-        tr:hover { background-color: #fcfcfc; }
+        /* --- TABLE - REDESIGNED FOR PROPER ALIGNMENT AND SCROLLING --- */
+        .table-wrapper {
+          background: var(--white);
+          border-radius: 12px;
+          box-shadow: var(--shadow);
+          overflow: hidden;
+          width: 100%;
+        }
+
+        .table-scroll {
+          overflow-x: auto;
+          overflow-y: auto;
+          max-height: 400px;
+          scrollbar-width: thin;
+          scrollbar-color: var(--primary) #f0f0f0;
+          -ms-overflow-style: none;  /* Hide scrollbar for IE and Edge */
+          scrollbar-width: none;  /* Hide scrollbar for Firefox */
+        }
+
+        /* Hide scrollbar for Chrome, Safari and Opera */
+        .table-scroll::-webkit-scrollbar {
+          display: none;
+        }
+
+        table {
+          width: 100%;
+          border-collapse: collapse;
+          min-width: 1200px;
+          table-layout: auto;
+        }
+
+        thead {
+          background: #f8f9fa;
+          border-bottom: 2px solid var(--border);
+          position: sticky;
+          top: 0;
+          z-index: 10;
+        }
+
+        th {
+          padding: 16px 12px;
+          text-align: left;
+          font-weight: 600;
+          color: var(--dark);
+          font-size: 0.85rem;
+          text-transform: uppercase;
+          letter-spacing: 0.5px;
+          white-space: nowrap;
+          background: #f8f9fa;
+        }
+
+        td {
+          padding: 16px 12px;
+          border-bottom: 1px solid var(--border);
+          font-size: 0.9rem;
+          color: #444;
+          vertical-align: middle;
+        }
+
+        /* Cell content wrapper for consistent alignment */
+        .cell-content {
+          max-width: 200px;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+        }
+
+        /* Status and action wrappers */
+        .status-wrapper, .action-wrapper {
+          display: flex;
+          align-items: center;
+          justify-content: flex-start;
+        }
+
+        tr:hover {
+          background-color: #fcfcfc;
+        }
+
+        tr:hover td {
+          background-color: #fcfcfc;
+        }
 
         /* Status Toggle Switch */
-        .switch { position: relative; display: inline-block; width: 40px; height: 22px; }
-        .switch input { opacity: 0; width: 0; height: 0; }
-        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 34px; }
-        .slider:before { position: absolute; content: ""; height: 16px; width: 16px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
-        input:checked + .slider { background-color: var(--success); }
-        input:checked + .slider:before { transform: translateX(18px); }
+        .switch { 
+          position: relative; 
+          display: inline-block; 
+          width: 40px; 
+          height: 22px; 
+          margin: 0;
+        }
+        
+        .switch input { 
+          opacity: 0; 
+          width: 0; 
+          height: 0; 
+        }
+        
+        .slider { 
+          position: absolute; 
+          cursor: pointer; 
+          top: 0; 
+          left: 0; 
+          right: 0; 
+          bottom: 0; 
+          background-color: #ccc; 
+          transition: .4s; 
+          border-radius: 34px; 
+        }
+        
+        .slider:before { 
+          position: absolute; 
+          content: ""; 
+          height: 16px; 
+          width: 16px; 
+          left: 3px; 
+          bottom: 3px; 
+          background-color: white; 
+          transition: .4s; 
+          border-radius: 50%; 
+        }
+        
+        input:checked + .slider { 
+          background-color: var(--success); 
+        }
+        
+        input:checked + .slider:before { 
+          transform: translateX(18px); 
+        }
 
-        .btn-edit { background: #edf2f7; color: #000; border: none; padding: 8px 12px; border-radius: 6px; cursor: pointer; transition: 0.2s; }
-        .btn-edit:hover { background: #e2e8f0; color: var(--primary); }
-        .btn-edit .icon-pencil { width: 16px; height: 16px; fill: currentColor; display: inline-block; }
+        .btn-edit { 
+          background: #edf2f7; 
+          color: #000; 
+          border: none; 
+          padding: 8px 12px; 
+          border-radius: 6px; 
+          cursor: pointer; 
+          transition: 0.2s;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+        }
+        
+        .btn-edit:hover { 
+          background: #e2e8f0; 
+          color: var(--primary); 
+        }
+        
+        .btn-edit .icon-pencil { 
+          width: 16px; 
+          height: 16px; 
+          fill: currentColor; 
+          display: inline-block; 
+        }
 
-        /* --- MODAL (Popup) --- */
+        /* Responsive table styles */
+        @media (max-width: 768px) {
+          .table-scroll {
+            max-height: 350px;
+          }
+          
+          th, td {
+            padding: 12px 8px;
+            font-size: 0.85rem;
+          }
+          
+          .cell-content {
+            max-width: 150px;
+          }
+        }
+
+        /* --- MODAL (Popup) Styles --- */
         .modal-overlay {
           position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5);
           display: none; justify-content: center; align-items: center; z-index: 1000;
+          padding: 20px;
         }
         .modal {
-          background: var(--white); width: 90%; max-width: 600px; padding: 30px; border-radius: 12px;
-          animation: slideDown 0.3s ease;
+          background: var(--white); 
+          width: 100%; 
+          max-width: 800px; 
+          border-radius: 16px;
+          box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2), 0 10px 10px -5px rgba(0, 0, 0, 0.1);
+          animation: modalSlideUp 0.3s ease;
+          overflow: hidden;
         }
-        .modal-header { display: flex; justify-content: space-between; margin-bottom: 20px; align-items: center; }
-        .modal-footer { display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px; }
-        .btn-cancel { background: #eee; color: #555; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; }
 
-        @keyframes slideDown { from { transform: translateY(-50px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        @keyframes modalSlideUp {
+          from { opacity: 0; transform: translateY(30px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
 
-        /* Responsive */
-        @media (max-width: 768px) {
-          .tab-container { width: 100%; justify-content: space-between; }
-          .tab-btn { padding: 10px 20px; font-size: 0.9rem; }
-          .form-grid { grid-template-columns: 1fr; }
+        .modal-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          padding: 20px 24px;
+          background: linear-gradient(135deg, var(--primary) 0%, var(--primary-hover) 100%);
+          color: white;
+          border-bottom: none;
+        }
+
+        .modal-header h3 {
+          margin: 0;
+          font-size: 1.3rem;
+          font-weight: 600;
+        }
+
+        .modal-close {
+          background: rgba(255, 255, 255, 0.2);
+          border: none;
+          color: white;
+          font-size: 24px;
+          cursor: pointer;
+          width: 36px;
+          height: 36px;
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          transition: all 0.2s;
+          line-height: 1;
+          padding: 0;
+        }
+
+        .modal-close:hover {
+          background: rgba(255, 255, 255, 0.3);
+          transform: rotate(90deg);
+        }
+
+        .modal-body {
+          padding: 24px;
+          max-height: 70vh;
+          overflow-y: auto;
+        }
+
+        .modal-form-grid {
+          display: flex;
+          flex-direction: column;
+          gap: 20px;
+        }
+
+        .form-row {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 20px;
+        }
+
+        .form-row.full-width {
+          grid-template-columns: 1fr;
+        }
+
+        .form-group.full-width {
+          width: 100%;
+        }
+
+        .modal .form-group {
+          margin-bottom: 0;
+        }
+
+        .modal .form-group label {
+          font-weight: 500;
+          color: var(--dark);
+          margin-bottom: 6px;
+          font-size: 0.9rem;
+        }
+
+        .modal .form-control {
+          background: #fff;
+          border: 1px solid var(--border);
+          border-radius: 8px;
+          padding: 10px 12px;
+          width: 100%;
+          transition: all 0.2s;
+        }
+
+        .modal .form-control:focus {
+          border-color: var(--primary);
+          box-shadow: 0 0 0 3px rgba(203, 33, 45, 0.1);
+          outline: none;
+        }
+
+        .modal-footer {
+          display: flex;
+          justify-content: flex-end;
+          gap: 12px;
+          padding: 20px 24px;
+          background: #f8f9fa;
+          border-top: 1px solid var(--border);
+        }
+
+        .btn-cancel {
+          background: white;
+          color: var(--text-gray);
+          border: 1px solid var(--border);
+          padding: 10px 24px;
+          border-radius: 8px;
+          font-weight: 500;
+          cursor: pointer;
+          transition: all 0.2s;
+        }
+
+        .btn-cancel:hover {
+          background: #f1f1f1;
+          border-color: #cbd5e0;
+        }
+
+        .modal-footer .btn-primary {
+          width: auto;
+          margin-top: 0;
+          padding: 10px 28px;
+          border-radius: 8px;
+          font-weight: 500;
+        }
+
+        /* Responsive styles for modal */
+        @media (max-width: 640px) {
+          .form-row {
+            grid-template-columns: 1fr;
+            gap: 15px;
+          }
+          
+          .modal {
+            max-width: 95%;
+          }
+          
+          .modal-body {
+            padding: 20px;
+          }
+          
+          .modal-footer {
+            padding: 16px 20px;
+            flex-direction: column-reverse;
+          }
+          
+          .modal-footer .btn-primary,
+          .btn-cancel {
+            width: 100%;
+          }
         }
       `}</style>
     </div>
